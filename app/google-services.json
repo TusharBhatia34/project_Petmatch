@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "689134515215",
+    "project_id": "petadoption-3663b",
+    "storage_bucket": "petadoption-3663b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:689134515215:android:938623d712a7a7ba2c9f7a",
+        "android_client_info": {
+          "package_name": "com.example.petadoptionapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDNQ_3Zn5YGwvvTtJne4FT99IoqUqmVZtQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
