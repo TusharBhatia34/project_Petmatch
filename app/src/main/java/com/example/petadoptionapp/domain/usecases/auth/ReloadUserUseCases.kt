@@ -6,6 +6,6 @@ import javax.inject.Inject
 class ReloadUserUseCases @Inject constructor(
     private val authRepo: AuthRepo
 ) {
-   suspend fun invoke():Boolean = authRepo.reloadUser()
+   suspend fun invoke()= authRepo.reloadUser()
 
 }

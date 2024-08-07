@@ -10,9 +10,10 @@ data class SavedPost(
     val gender:String="",
     val healthInformation:String="",
     val location:String="",
-    val photos:List<String> = emptyList(),
-    val timestamp: String = Timestamp.now().toString(),
-    val type:String="",
     val name:String ="",
-    val savedBy:String =""
+    val photos:List<String> = emptyList(),
+    val postTimestamp: Timestamp = Timestamp.now(),
+    val savedBy:String ="",
+    val timestamp: Timestamp = Timestamp.now(),
+    val type:String=""
 )

@@ -1,11 +1,12 @@
 package com.example.petadoptionapp.domain.model
 
 data class UserProfile(
-    val username:String,
-    val country:String,
-    val state:String,
-    val city:String,
-    val profilePicture:String,
-    val authorId:String,
-    val description:String
+    val name:String="",
+    val country:String="",
+    val state:String = "",
+    val city:String = "",
+    val profilePicture:String="",
+    val about:String="",
+    val latitude:Double = 0.0,
+    val longitude:Double = 0.0
 )

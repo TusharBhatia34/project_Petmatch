@@ -9,6 +9,7 @@ import com.example.petadoptionapp.domain.model.Post
 import com.example.petadoptionapp.domain.model.SavedPost
 import com.example.petadoptionapp.domain.repo.PostRepo
 import com.google.firebase.Firebase
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.toObject
 import com.google.firebase.storage.storage
@@ -28,7 +29,8 @@ class PostRepoImp: PostRepo {
                 imageUrls.add(uploadFile(uri))
             }
             db.collection(Collections.POSTS)
-                .add(post.copy(photos = imageUrls))
+                .document("${post.authorId}_${post.timestamp.toDate()}_${post.timestamp.toDate().time}")
+                .set(post.copy(photos = imageUrls))
                 .await()
             return Response.Success(true)
         }
@@ -66,7 +68,8 @@ db.collection(Collections.POSTS)
 
         try{
             db.collection(Collections.SAVED_POST)
-                .add(savedPost)
+                .document("${savedPost.authorId}_${savedPost.savedBy}_${savedPost.postTimestamp}")
+                .set(savedPost)
                 .await()
             return Response.Success(true)
         }
@@ -75,49 +78,43 @@ db.collection(Collections.POSTS)
         }
     }
 
-    override suspend fun getSavedPost() {
+    override suspend fun getSavedPost():Response<Boolean> {
         try {
             val savedList  = mutableListOf<SavedPost>()
             val result =  db.collection(Collections.SAVED_POST)
-                .whereEqualTo("savedBy",Collections.currentUser!!.uid)
+                .whereEqualTo("savedBy",SharedComponents.currentUser!!.uid)
                 .get()
                 .await()
-
-            if (result.isEmpty){
-                SharedComponents.savedList = mutableListOf()
-            }
-            else{
                 for (document in result){
+
+
                     val savedPost = document.toObject<SavedPost>()
                     savedList.add(savedPost)
                 }
                 SharedComponents.savedList = savedList
-            }
+
+
+            return Response.Success(true)
         }
         catch(e:Exception){
-            Log.d("error",e.toString())
+         return Response.Failure(e)
         }
     }
 
     override suspend fun removeSavedPost(
         authorId: String,
-        timeStamp: String,
+        postTimestamp: Timestamp,
         savedBy: String,
     ): Response<Boolean> {
         try {
 
 
 
-          val documents =  db.collection(Collections.SAVED_POST)
-                .whereEqualTo("authorId",authorId)
-                .whereEqualTo("timestamp",timeStamp)
-                .whereEqualTo("savedBy",savedBy)
-                .get()
-                .await()
+         db.collection(Collections.SAVED_POST)
+              .document("${authorId}_${savedBy}_${postTimestamp}")
+              .delete()
+              .await()
 
-            for(document in documents){
-        db.collection(Collections.SAVED_POST).document(document.id).delete().await()
-            }
 
             return Response.Success(true)
         }
@@ -126,8 +123,29 @@ db.collection(Collections.POSTS)
         }
     }
 
+    override suspend fun getMyPosts(): Pair<Response<Boolean>, List<Post>> {
+
+        try {
+
+            val myPostList = mutableListOf<Post>()
+            val result = db.collection(Collections.POSTS)
+                .whereEqualTo("authorId",SharedComponents.currentUser!!.uid)
+                .get()
+                .await()
+            for(document in result){
+                val post = document.toObject<Post>()
+                myPostList.add(post)
+            }
+            return Pair(Response.Success(true),myPostList)
+        }
+        catch (e:Exception){
+            return Pair(Response.Failure(e), emptyList())
+        }
+    }
+
+
     private suspend fun uploadFile(fileUrl:String):String{
-        val ref = storage.reference.child("images/${fileUrl}")
+        val ref = storage.reference.child("posts/${fileUrl}")
         ref.putFile(fileUrl.toUri()).await()
         return ref.downloadUrl.await().toString()
     }

@@ -77,6 +77,12 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+
+    //room
+    implementation (libs.androidx.room.runtime)
+    implementation (libs.androidx.room.ktx)
+    kapt (libs.androidx.room.compiler)
+
     //firebase
     implementation(platform(libs.firebase.bom))
     implementation("com.google.firebase:firebase-firestore")
@@ -84,6 +90,7 @@ dependencies {
 
     //navigation
     implementation(libs.androidx.navigation.compose)
+
     //coil
     implementation(libs.coil.compose)
 
@@ -103,9 +110,20 @@ dependencies {
    implementation (libs.androidx.material.icons.extended)
     implementation(libs.firebase.storage)
 
+    //google maps
+    implementation(libs.maps.compose)
+    implementation(libs.play.services.location)
 
+    //calendar picker
+    // Implementing the `core` module is mandatory for using other use cases.
+    implementation("com.maxkeppeler.sheets-compose-dialogs:core:1.0.0")
+    implementation("com.maxkeppeler.sheets-compose-dialogs:calendar:1.0.0")
 
+    //datastore
+    implementation(libs.androidx.datastore.preferences)
 
+    //accompanist
+    implementation(libs.accompanist.permissions)
 
 
 }

@@ -10,17 +10,24 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
-    primary = primaryDark,
-    onPrimary = onPrimaryDark,
-    primaryContainer = primaryContainerDark,
-    onPrimaryContainer = onPrimaryContainerDark,
-    surface = surfaceDark,
+    primary = primaryLight,
+    onPrimary = onPrimaryLight,
+    primaryContainer = primaryContainerLight,
+    onPrimaryContainer = onPrimaryContainerLight,
+    surface = surfaceDark ,
+    onBackground = disableTextColorDark,
+    surfaceContainer = surfaceContainerDark,
+    secondaryContainer = secondaryContainerDark,
+    onSecondaryContainer = onSecondaryContainerDark,
+    inversePrimary = inversePrimaryDark,
+    onSurface = Color.White,
 
 )
 
@@ -29,18 +36,17 @@ private val LightColorScheme = lightColorScheme(
     onPrimary = onPrimaryLight,
     primaryContainer = primaryContainerLight,
     onPrimaryContainer = onPrimaryContainerLight,
-    surface =surfaceLight
+    surface = surfaceLight,
+    onBackground = disableTextColorLight,
+    surfaceContainer = surfaceContainerLight,
+    secondaryContainer = secondaryContainerLight,
+    onSecondaryContainer = onSecondaryContainerLight,
+    inversePrimary = inversePrimaryLight,
+    onSurface = Color.Black,
 
 
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+
+
 )
 
 @Composable
@@ -72,6 +78,7 @@ fun PetAdoptionAppTheme(
         windowSizeClass.width.size> windowSizeClass.height.size -> Orientation.Landscape
         else -> Orientation.Portrait
     }
+
     val sizeThatMatters = when(orientation){
         Orientation.Portrait -> windowSizeClass.width
         Orientation.Landscape -> windowSizeClass.height
@@ -82,27 +89,32 @@ fun PetAdoptionAppTheme(
         is WindowSize.Large -> largeDimensions
         is WindowSize.Medium -> mediumDimensions
     }
-    val typography = when(sizeThatMatters){
+
+    val typography =  when(sizeThatMatters){
         is WindowSize.Small -> typographySmall
         is WindowSize.Compact -> typographyCompact
         is WindowSize.Large -> typographyBig
         is WindowSize.Medium -> typographyMedium
     }
+    ProvideAppUtils(dimensions = dimensions, orientation = orientation) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = typography,
+            content = content
+        )
+    }
 
-ProvideAppUtils(dimensions = dimensions, orientation = orientation) {
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = typography,
-        content = content
-    )
-}
+
+
 
 }
 object AppTheme {
     val dimens: Dimensions
         @Composable
         get() = LocalAppDimens.current
-    val orientation: Orientation
+        val orientation: Orientation
         @Composable
         get() = LocalOrientationMode.current
 }
+
+

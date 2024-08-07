@@ -1,12 +1,8 @@
 package com.example.petadoptionapp.data.common
 
-import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
-
 object Collections {
-    val POSTS = "posts"
-    val USERS= "users"
-    val SAVED_POST = "savedpost"
-    var currentUser =Firebase.auth.currentUser
-
+     const  val POSTS = "posts"
+     const val USERS= "users"
+     const val SAVED_POST = "savedpost"
+     const val APPLICATIONS = "applications"
 }
