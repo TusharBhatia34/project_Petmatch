@@ -41,6 +41,14 @@ I am actively working on these features and will update the status as developmen
 - **Jetpack Compose:** For building a modern and responsive user interface with Kotlin.
 - **Kotlin:** The primary programming language used for app development.
 - **Firebase:** For managing user login and registration , managing and storing data and images.
+
+## Screenshots
+![image](https://github.com/user-attachments/assets/914deca8-65d9-4d6c-a85d-e50bb6b25b8d) ![image](https://github.com/user-attachments/assets/5d96f92f-77ec-4ccd-be83-498f73b7e9ac)
+![image](https://github.com/user-attachments/assets/fc158903-0bf6-4629-a217-d7c3aa35d52a)  ![image](https://github.com/user-attachments/assets/137a3ab0-c1c1-4cec-a697-74a658a19a63)
+
+
+
+
   
 
 
