@@ -97,9 +97,10 @@ trySend(Response.Failure(e))
 
     override suspend fun signOut() {
         auth.signOut()
+        SharedComponents.currentUser = null
         userDatastore.clearDataStore()
         db.clearAllTables()
-        SharedComponents.currentUser = null
+
     }
 
     override suspend fun resetPassword(email: String): Flow<Response<Boolean>> =  callbackFlow {

@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -37,6 +38,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import coil.compose.SubcomposeAsyncImage
 import com.example.petadoptionapp.R
 import com.example.petadoptionapp.data.common.Response
 import com.example.petadoptionapp.data.common.Routes
@@ -86,7 +88,9 @@ fun NotificationScreen(
                 }
 
                 Response.Loading -> {
-                 Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface), contentAlignment = Alignment.Center){
+                 Box(modifier = Modifier
+                     .fillMaxSize()
+                     .background(MaterialTheme.colorScheme.surface), contentAlignment = Alignment.Center){
                      CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimary, strokeWidth = 4.dp)
                  }
                 }
@@ -122,9 +126,28 @@ fun NotificationScreen(
                                     },
                                   ){
 
-                                    Image(painter = painterResource(id = R.drawable.defaultpp), contentDescription = null,modifier = Modifier
-                                        .clip(CircleShape)
-                                        .size(50.dp))
+
+                                    if(applicationsList.value[index].applicantProfilePicture == "") {
+                                        Image(painter = painterResource(id = R.drawable.defaultpp), contentDescription = null,modifier = Modifier
+                                            .clip(CircleShape)
+                                            .size(50.dp))
+                                      }
+                                    else {
+                                        SubcomposeAsyncImage(model = applicationsList.value[index].applicantProfilePicture, contentDescription = null, contentScale = ContentScale.Crop , modifier = Modifier
+                                            .clip(CircleShape)
+                                            .size(50.dp),
+                                            loading = {
+                                                Box(
+                                                    modifier = Modifier.fillMaxSize(),
+                                                    contentAlignment = Alignment.Center
+                                                ) {
+                                                    CircularProgressIndicator(modifier = Modifier.size(35.dp),color = MaterialTheme.colorScheme.inversePrimary)
+
+                                                }
+                                            }
+                                        )
+                                    }
+
                                     Spacer(modifier = Modifier.width(AppTheme.dimens.medium ))
                                     Text(
                                         text = "${applicationsList.value[index].applicantUserName} has applied to adopt ${applicationsList.value[index].petName}. Review the application now!",

@@ -106,10 +106,13 @@ class ProfileViewModel @Inject constructor(
         location:String,
         about: String,
         profilePicture: String,
-        locationInLong: Location
+        locationInLong: Location,
+        sameImage:Boolean
 
     ){
         val splitLocation = location.split(",")
+        Log.d("profile", "${splitLocation[0]},${splitLocation[1]},${splitLocation[2]} viewmodel")
+
         val userProfile = UserProfile(
             name = name,
             country = splitLocation[2],
@@ -121,7 +124,7 @@ class ProfileViewModel @Inject constructor(
             longitude = locationInLong.long
         )
         viewModelScope.launch {
-            _profileSavedResponse.value =    saveProfileUseCase.invoke(userProfile)
+            _profileSavedResponse.value = saveProfileUseCase.invoke(userProfile,sameImage)
              
         }
     }

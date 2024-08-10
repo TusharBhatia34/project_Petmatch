@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -30,6 +31,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.petadoptionapp.data.common.Routes
 import com.example.petadoptionapp.presentation.viewModels.AuthViewModel
+import com.example.petadoptionapp.ui.theme.quickSand
 
 //
 @Composable
@@ -139,13 +141,23 @@ Column(modifier = Modifier
                     showLogOutDialog =false
 
 
-                }) {
-                    Text("Confirm")
+                },     colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )) {
+                    Text("Confirm",fontWeight = FontWeight.Bold,
+                        fontFamily = quickSand
+                    )
                 }
             },
             dismissButton = {
-                Button(onClick = { showLogOutDialog = false }) {
-                    Text("Cancel")
+                Button(onClick = { showLogOutDialog = false },
+                    colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )) {
+                    Text("Cancel",fontWeight = FontWeight.Bold,
+                        fontFamily = quickSand)
                 }
             },
             title = { Text(text ="Confirm Logout", fontWeight = FontWeight.Bold)},

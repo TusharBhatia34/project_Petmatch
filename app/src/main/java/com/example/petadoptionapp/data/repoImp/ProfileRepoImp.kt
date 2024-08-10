@@ -26,13 +26,15 @@ class ProfileRepoImp @Inject constructor(
         TODO("Not yet implemented")
     }
 
-    override suspend fun saveProfile(userProfile: UserProfile): Response<Boolean> {
+    override suspend fun saveProfile(userProfile: UserProfile,sameImage:Boolean): Response<Boolean> {
         try {
-            var imageUrl = ""
+            var imageUrl = userProfile.profilePicture
+            if(!sameImage){
+              imageUrl = uploadProfilePicture(userProfile.profilePicture)
+                          }
 
-            if(userProfile.profilePicture!=""){
-              imageUrl =  uploadProfilePicture(userProfile.profilePicture)
-            }
+
+
             val profile = userProfile.copy(profilePicture = imageUrl)
             db.collection(Collections.USERS)
                 .document(SharedComponents.currentUser!!.uid)

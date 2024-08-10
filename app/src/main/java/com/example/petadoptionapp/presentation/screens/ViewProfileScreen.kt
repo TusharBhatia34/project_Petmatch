@@ -25,7 +25,7 @@ fun ViewProfileScreen(
             screenTitle = "Profile" ,
             currentLocation = Location(profile.latitude,profile.longitude) ,
             buttonText = "Edit",
-            buttonAction = {name,location,about,profilePicture ,locationInDouble->}, //we won't use this button action in viewProfileScreen.
+            buttonAction = {name,location,about,profilePicture ,locationInDouble,sameImage->}, //we won't use this button action in viewProfileScreen.
             responseAction = { /*TODO*/ },
             navController = navController ,
             response = response,

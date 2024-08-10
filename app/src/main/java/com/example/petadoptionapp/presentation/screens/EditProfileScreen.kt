@@ -20,15 +20,17 @@ fun EditProfileScreen(
             name = profile.name,
             about = profile.about ,
             profilePicture = profile.profilePicture ,
-            location = "${profile.city},${profile.state}, ${profile.country}",
+            location = "${profile.city},${profile.state},${profile.country}",
             screenTitle = "Edit Profile" ,
             currentLocation = Location(profile.latitude,profile.longitude) ,
             buttonText = "Save",
-            buttonAction = { name,location,about,profilePicture ,locationInDouble->
-                profileViewModel.saveProfile(name, location, about, profilePicture,locationInDouble)
+            buttonAction = { name,location,about,profilePicture ,locationInDouble,sameImage->
+                profileViewModel.saveProfile(name, location, about, profilePicture,locationInDouble,sameImage)
             },
             responseAction = {
-                             navController.navigate(Routes.ViewProfileScreen)
+                navController.navigate(Routes.ViewProfileScreen){
+                    popUpTo(Routes.ViewProfileScreen){inclusive = true}
+                }
                 profileViewModel.resetValue()
             },
             navController = navController ,

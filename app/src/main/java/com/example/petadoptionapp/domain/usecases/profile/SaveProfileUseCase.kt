@@ -9,5 +9,5 @@ class SaveProfileUseCase @Inject constructor(
     private val profileRepo: ProfileRepo
 ) {
 
-    suspend fun invoke(userProfile: UserProfile): Response<Boolean> = profileRepo.saveProfile(userProfile)
+    suspend fun invoke(userProfile: UserProfile,sameImage:Boolean): Response<Boolean> = profileRepo.saveProfile(userProfile,sameImage)
 }

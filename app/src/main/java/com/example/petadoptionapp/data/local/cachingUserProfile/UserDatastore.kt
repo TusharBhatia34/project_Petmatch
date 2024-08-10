@@ -37,6 +37,7 @@ class UserDatastore @Inject constructor(private val context: Context) {
      fun getProfileInfo() =  context.dataStore.data.map { preferences ->
              val location = preferences[LOCATION_KEY]
              val splitLocation = location?.split(",")?: listOf("city","state","country")
+
              UserProfile(
                  name = preferences[NAME_KEY]?:"Unknown",
                  country = splitLocation[2],
@@ -57,7 +58,7 @@ class UserDatastore @Inject constructor(private val context: Context) {
         context.dataStore.edit { preferences ->
             preferences[PROFILE_PICTURE] = userProfile.profilePicture
             preferences[NAME_KEY] = userProfile.name
-            preferences[LOCATION_KEY] = "${userProfile.city},${userProfile.state}, ${userProfile.country}"
+            preferences[LOCATION_KEY] = "${userProfile.city},${userProfile.state},${userProfile.country}"
             preferences[ABOUT_KEY] = userProfile.about
             preferences[PROFILE_EXISTS_KEY] = true
             preferences[LATITUDE_KEY] = userProfile.latitude
@@ -76,4 +77,14 @@ class UserDatastore @Inject constructor(private val context: Context) {
             preferences.clear()
         }
     }
-}
+
+    suspend fun getCurrentProfileLocation() =
+        context.dataStore.data.map{pref ->
+            pref[LOCATION_KEY]
+        }
+    suspend fun getCurrentProfilePicture() =
+        context.dataStore.data.map{pref ->
+            pref[PROFILE_PICTURE]
+        }
+    }
+

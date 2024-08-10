@@ -56,7 +56,7 @@ fun ApplyApplicationScreen(
     petName:String,
     applicationViewModel: ApplicationViewModel = hiltViewModel(),
 ) {
-
+    val currentProfilePicture = applicationViewModel.currentProfilePicture.collectAsStateWithLifecycle()
     val sendApplicationResponse = applicationViewModel.sendingApplicationResponse.collectAsStateWithLifecycle()
     val context = LocalContext.current
     var isClicked by remember {
@@ -93,7 +93,7 @@ fun ApplyApplicationScreen(
 
                         if(!hasEmptyAnswersExceptPhoneNumber(applicationAnswers)){
                             isClicked = true
-                            applicationViewModel.sendApplication(applicationAnswers,authorId, applicantId,SharedComponents.timeStamp,"applicantpicture",applicantUserName?:"",petName)
+                            applicationViewModel.sendApplication(applicationAnswers,authorId, applicantId,SharedComponents.timeStamp,currentProfilePicture.value,applicantUserName?:"",petName)
                         }
                         else {
                             Toast.makeText(context,"please answer remaining questions.",Toast.LENGTH_SHORT).show()

@@ -5,7 +5,7 @@ import com.example.petadoptionapp.domain.model.UserProfile
 
 interface ProfileRepo {
     suspend fun editProfile()
-    suspend fun saveProfile(userProfile: UserProfile):Response<Boolean>
+    suspend fun saveProfile(userProfile: UserProfile,sameImage:Boolean):Response<Boolean>
 
     suspend fun userProfile():Response<Boolean>
 

@@ -240,13 +240,13 @@ Box(modifier = Modifier.fillMaxSize()){
             Spacer(modifier = Modifier.height(AppTheme.dimens.small))
 
             Row {
-                Text(text = "breed:",modifier = Modifier.width(60.dp), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+                Text(text = "breed:",modifier = Modifier.width(70.dp), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
                 Text(text = post.breed,modifier =Modifier.alpha(0.6f), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
             }
 
             Spacer(modifier = Modifier.height(AppTheme.dimens.small))
             Row {
-                Text(text = "health:",modifier = Modifier.width(60.dp), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+                Text(text = "health:",modifier = Modifier.width(70.dp), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
                 Text(
                     text = post.healthInformation,
                     modifier = Modifier.alpha(0.6f),

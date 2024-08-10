@@ -1,12 +1,12 @@
 package com.example.petadoptionapp.presentation.viewModels
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.petadoptionapp.data.common.Response
 import com.example.petadoptionapp.data.common.SharedComponents
 import com.example.petadoptionapp.data.local.cachingAppliedApplications.Entity
+import com.example.petadoptionapp.data.local.cachingUserProfile.UserDatastore
 import com.example.petadoptionapp.data.local.gettingCurrentLocation.DefaultLocationClient
 import com.example.petadoptionapp.data.local.gettingCurrentLocation.hasLocationPermission
 import com.example.petadoptionapp.domain.model.Location
@@ -40,7 +40,8 @@ class PostViewModel @Inject constructor(
     private val applicationContext: Context,
     private val addAppliedApplicationLocallyUseCase: AddAppliedApplicationLocallyUseCase,
    private val databaseIsEmptyUseCase: DatabaseIsEmptyUseCase,
-    private val getAppliedApplicationsUseCase: GetAppliedApplicationsUseCase
+    private val getAppliedApplicationsUseCase: GetAppliedApplicationsUseCase,
+    private val userDatastore: UserDatastore
 ):ViewModel() {
 
     private val _post = MutableStateFlow<List<Post>>(emptyList())
@@ -57,26 +58,30 @@ class PostViewModel @Inject constructor(
     val getSavedPostsResponse = _getSavedPostsResponse.asStateFlow()
 
     private var _gettingCurrentLocationResponse = MutableStateFlow<Response<Boolean>>(Response.Loading)
-    var gettingCurrentLocationResponse = _gettingCurrentLocationResponse.asStateFlow()
+    val gettingCurrentLocationResponse = _gettingCurrentLocationResponse.asStateFlow()
 
     private var _location = MutableStateFlow(Location())
-    var location = _location.asStateFlow()
+    val location = _location.asStateFlow()
 
     private var _appliedApplicationsLocallyList = MutableStateFlow<List<Entity>>(emptyList())
-    var appliedApplicationsLocallyList = _appliedApplicationsLocallyList.asStateFlow()
+    val appliedApplicationsLocallyList = _appliedApplicationsLocallyList.asStateFlow()
 
+
+    private var _currentProfileLocation = MutableStateFlow("")
+    val currentProfileLocation = _currentProfileLocation.asStateFlow()
 
     init {
         if(applicationContext.hasLocationPermission()){
             getPost()
             getSavedPost()
       getCurrentLocation()
+            getProfileLocationLocally()
     }
     }
 
     init {  //caching mechanism for applied applications
         viewModelScope.launch(Dispatchers.IO) {
-val currentUser = SharedComponents.currentUser
+        val currentUser = SharedComponents.currentUser
             if(databaseIsEmptyUseCase.invoke() && currentUser!=null){
                 addAppliedApplicationLocallyUseCase.invoke(Entity("dummy"))
                 val result =  getAppliedApplicationsUseCase.invokeToGetAppliedApplicationsRemotely(currentUser.uid)
@@ -153,6 +158,14 @@ val currentUser = SharedComponents.currentUser
     fun resetValue(){
         _createPostResponse.value = Response.Success(false)
         _saveOrUnsavePostResponse.value = Response.Loading
+    }
+
+   private fun getProfileLocationLocally(){
+        viewModelScope.launch {
+            userDatastore.getCurrentProfileLocation().collect{
+                _currentProfileLocation.value = it?:""
+            }
+        }
     }
 
 

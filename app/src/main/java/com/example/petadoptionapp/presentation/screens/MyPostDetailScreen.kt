@@ -1,5 +1,6 @@
 package com.example.petadoptionapp.presentation.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,17 +32,21 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.petadoptionapp.domain.model.Post
 import com.example.petadoptionapp.presentation.components.ImageSlider
+import com.example.petadoptionapp.presentation.viewModels.MyPostViewModel
+import com.example.petadoptionapp.ui.theme.AppTheme
 import com.example.petadoptionapp.ui.theme.male
 
 @Composable
 fun MyPostDetailScreen(
-    post:Post,
+    post: Post,
     navController: NavController,
+    myPostViewModel: MyPostViewModel = hiltViewModel(),
 ) {
     val localDensity = LocalDensity.current
     var nameTextHeightDp by remember { mutableStateOf(0.dp) }
@@ -49,6 +54,7 @@ fun MyPostDetailScreen(
     Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(MaterialTheme.colorScheme.surface)
                 .padding(8.dp)
                 .verticalScroll(rememberScrollState())
         ) {
@@ -59,71 +65,80 @@ fun MyPostDetailScreen(
                     navController.popBackStack()
                 }
             )
-
-            Spacer(modifier = Modifier.height(16.dp))
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                Text(
-                    text = post.name,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 30.sp,
-                    modifier = Modifier
-                        .onGloballyPositioned {
-                            nameTextHeightDp = with(localDensity) { it.size.height.toDp() }
-                        }
-                )
-                Icon(
-                    imageVector = if(post.gender=="Male") Icons.Default.Male else Icons.Default.Female
-                    , contentDescription = null,
-                    modifier = Modifier
-                        .size(nameTextHeightDp),
-                    tint = if(post.gender=="Male") male else MaterialTheme.colorScheme.primaryContainer
-                )
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-            Row (
-                modifier = Modifier.wrapContentSize()
-            ) {
-                Icon(imageVector = Icons.Default.LocationOn
-                    , contentDescription = null,
-                    modifier = Modifier
-                        .wrapContentSize()
-                        .padding(end = 2.dp)
-                        .alpha(0.5f)
-                        .size(locationTextHeightDp)
-                )
-                Text(text = post.location,modifier = Modifier
-                    .alpha(0.5f)
+        Spacer(modifier = Modifier.height(AppTheme.dimens.mediumLarge))
+        Row(
+            modifier =Modifier
+                .fillMaxWidth()
+        ) {
+            Text(
+                text = post.name,
+                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.displayMedium,
+                modifier =Modifier
                     .onGloballyPositioned {
-                        locationTextHeightDp = with(localDensity) { it.size.height.toDp() }
-                    })
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-            Row {
-                Text(text = "Age:",modifier = Modifier.width(60.dp), fontWeight = FontWeight.SemiBold)
-                Text(text = post.age,modifier = Modifier.alpha(0.6f))
-            }
-            Spacer(modifier = Modifier.height(2.dp))
+                        nameTextHeightDp = with(localDensity) { it.size.height.toDp() }
+                    }
+            )
+            Icon(
+                imageVector = if(post.gender=="Male")Icons.Default.Male else Icons.Default.Female
+                , contentDescription = null,
+                modifier =Modifier
+                    .size(nameTextHeightDp),
+                tint = if(post.gender=="Male") male else MaterialTheme.colorScheme.primaryContainer
+            )
 
-            Row {
-                Text(text = "breed:",modifier = Modifier.width(60.dp), fontWeight = FontWeight.SemiBold)
-                Text(text = post.breed,modifier = Modifier.alpha(0.6f))
-            }
 
-            Spacer(modifier = Modifier.height(2.dp))
-            Row {
-                Text(text = "health:",modifier = Modifier.width(60.dp), fontWeight = FontWeight.SemiBold)
-                Text(text = post.healthInformation,modifier = Modifier.alpha(0.6f))
-            }
+        }
+        Spacer(modifier = Modifier.height(AppTheme.dimens.medium))
+        Row (
+            modifier = Modifier.wrapContentSize()
+        ) {
+            Icon(imageVector = Icons.Default.LocationOn
+                , contentDescription = null,
+                modifier = Modifier
+                    .wrapContentSize()
+                    .padding(end = 2.dp)
+                    .alpha(0.5f)
+                    .size(locationTextHeightDp)
+            )
+            Text(text = post.location,modifier = Modifier
+                .alpha(0.5f)
+                .onGloballyPositioned {
+                    locationTextHeightDp = with(localDensity) { it.size.height.toDp() }
+                })
+        }
+        Spacer(modifier = Modifier.height(AppTheme.dimens.mediumLarge))
+        Row {
+            Text(text = "Born on:",modifier = Modifier.width(70.dp), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+            Text(text = post.age,modifier =Modifier.alpha(0.6f), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+        }
+        Spacer(modifier = Modifier.height(AppTheme.dimens.small))
 
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "Description", fontWeight = FontWeight.Bold)
-            Spacer(modifier = Modifier.height(4.dp))
-            ExpandableText(text = post.description, fontSize = 15.sp)
+        Row {
+            Text(text = "breed:",modifier = Modifier.width(70.dp), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+            Text(text = post.breed,modifier =Modifier.alpha(0.6f), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+        }
 
-            Spacer(modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier.height(AppTheme.dimens.small))
+        Row {
+            Text(text = "health:",modifier = Modifier.width(70.dp), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+            Text(
+                text = post.healthInformation,
+                modifier = Modifier.alpha(0.6f),
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Bold,
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1
+
+            )
+        }
+
+        Spacer(modifier = Modifier.height(AppTheme.dimens.mediumLarge))
+        Text(text = "Description", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
+        Spacer(modifier = Modifier.height(AppTheme.dimens.smallMedium))
+        ExpandableText(text = post.description, fontSize = MaterialTheme.typography.bodyMedium.fontSize)
+
+        Spacer(modifier = Modifier.weight(1f))
 
 
             Row (modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly){

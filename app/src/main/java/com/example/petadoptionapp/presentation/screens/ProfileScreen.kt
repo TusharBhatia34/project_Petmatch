@@ -56,7 +56,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
+import coil.compose.SubcomposeAsyncImage
 import com.example.petadoptionapp.R
 import com.example.petadoptionapp.data.common.Response
 import com.example.petadoptionapp.data.common.Routes
@@ -74,7 +74,7 @@ fun ProfileScreen(
     screenTitle:String,
     currentLocation: Location,
     buttonText:String,
-    buttonAction :(name:String, location:String,about:String,profilePicture:String,locationInDouble:Location)->Unit,
+    buttonAction :(name:String, location:String,about:String,profilePicture:String,locationInDouble:Location,sameImage:Boolean)->Unit,
     responseAction :()->Unit,
     enabled:Boolean= true,
     navController: NavController,
@@ -107,7 +107,8 @@ Scaffold (
                 if(enabled){
                     if(usernameField!=""&&aboutField !=""&&locationField!=""){
                         isClicked = true
-                        buttonAction(usernameField, locationField, aboutField, profilePictureField ,locationInDouble)
+val sameImage = initialProfilePictureField == profilePictureField
+                        buttonAction(usernameField, locationField, aboutField,profilePictureField ,locationInDouble,sameImage)
                     }
                     else {
                         Toast.makeText(context,"Please fill all the details.",Toast.LENGTH_SHORT).show()
@@ -175,11 +176,20 @@ Scaffold (
                         .size(180.dp))
             }
             else{
-                AsyncImage(model =profilePictureField, contentDescription = null,
+                SubcomposeAsyncImage(model =profilePictureField, contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .clip(CircleShape)
                         .size(180.dp),
+                    loading = {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(modifier = Modifier.size(35.dp),color = MaterialTheme.colorScheme.inversePrimary)
+
+                        }
+                    }
                 )
             }
 
@@ -284,7 +294,7 @@ Scaffold (
                 is Response.Failure -> {
 
                     Toast.makeText(context, res.e.message, Toast.LENGTH_SHORT).show()
-
+                    isClicked = false
                 }
                 Response.Loading -> {
                 }

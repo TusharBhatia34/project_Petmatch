@@ -1,7 +1,6 @@
 package com.example.petadoptionapp.presentation.screens
 
 import android.location.Geocoder
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -17,6 +16,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -65,9 +65,11 @@ fun MapScreen(lat:Double, long:Double, navController: NavController) {
                 draggable = true,
             )
         }
-        Icon(imageVector = Icons.Filled.ArrowBackIosNew, contentDescription = null,modifier = Modifier
-            .clickable { navController.popBackStack() }
-            .padding(16.dp), tint = Color.Black )
+        IconButton(onClick = {  navController.popBackStack()}) {
+            Icon(imageVector = Icons.Filled.ArrowBackIosNew, contentDescription = null
+                , tint = Color.Black )
+        }
+
 
         val geocoder = Geocoder(LocalContext.current, Locale.getDefault())
         val addresses =  geocoder.getFromLocation(current.latitude, current.longitude, 1)
@@ -89,7 +91,7 @@ fun MapScreen(lat:Double, long:Double, navController: NavController) {
                 )
 
                 if (!addresses.isNullOrEmpty()) {
-                    val location = "${addresses[0].locality},${addresses[0].adminArea}, ${addresses[0].countryName}"
+                    val location = "${addresses[0].locality},${addresses[0].adminArea},${addresses[0].countryName}"
 
                     Text(text = location,fontWeight = FontWeight.Normal, style = MaterialTheme.typography.bodyMedium)
                     Spacer(modifier = Modifier.weight(1f))
@@ -129,13 +131,7 @@ fun MapScreen(lat:Double, long:Double, navController: NavController) {
 
         }
 
-        if (addresses != null) {
-            if (addresses.isNotEmpty()) {
-                val cityName = addresses[0].locality
-                val stateName = addresses[0].adminArea
-                val countryName = addresses[0].countryName
-            }
-        }
+
         LaunchedEffect(key1 = markerState.position) {
             delay(1000L)
             current = LatLng(markerState.position.latitude, markerState.position.longitude)

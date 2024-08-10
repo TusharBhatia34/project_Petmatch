@@ -63,7 +63,6 @@ fun ImageSlider(
                 contentScale = ContentScale.FillBounds,
                 modifier = Modifier
                     .clip(RoundedCornerShape(20.dp))
-
                     .fillMaxHeight(),
 loading = {
     Box(

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.petadoptionapp.data.common.Response
 import com.example.petadoptionapp.data.local.cachingAppliedApplications.Entity
+import com.example.petadoptionapp.data.local.cachingUserProfile.UserDatastore
 import com.example.petadoptionapp.domain.model.Applications
 import com.example.petadoptionapp.domain.model.Post
 import com.example.petadoptionapp.domain.usecases.application.AddAppliedApplicationLocallyUseCase
@@ -26,6 +27,7 @@ class ApplicationViewModel @Inject constructor(
     private val getApplicationPostUseCase: GetApplicationPostUseCase,
     private val editNotificationUseCase: EditNotificationUseCase,
     private val addAppliedApplicationLocallyUseCase: AddAppliedApplicationLocallyUseCase,
+    private val userDatastore: UserDatastore
     ): ViewModel()  {
 
     private val _sendingApplicationResponse = MutableStateFlow<Response<Boolean>>(Response.Loading)
@@ -37,11 +39,16 @@ class ApplicationViewModel @Inject constructor(
 
     private val _getApplicationPostResponse = MutableStateFlow<Response<Boolean>>(Response.Loading)
     val getApplicationPostResponse = _getApplicationPostResponse.asStateFlow()
+
     private val _getApplicationPost = MutableStateFlow<Post?>(null)
     val getApplicationPost = _getApplicationPost.asStateFlow()
 
+    private var _currentProfilePicture = MutableStateFlow("")
+    val currentProfilePicture = _currentProfilePicture.asStateFlow()
+
     init {
         getApplications()
+        getProfilePictureLocally()
     }
     fun sendApplication(
         answers: List<String>,
@@ -98,6 +105,14 @@ class ApplicationViewModel @Inject constructor(
     fun insertAppliedApplication(uniqueIdentifier:String){
         viewModelScope.launch(Dispatchers.IO) {
             addAppliedApplicationLocallyUseCase.invoke(entity = Entity(uniqueIdentifier))
+        }
+    }
+
+    private fun getProfilePictureLocally(){
+        viewModelScope.launch {
+            userDatastore.getCurrentProfilePicture().collect{
+                _currentProfilePicture.value = it?:""
+            }
         }
     }
 }

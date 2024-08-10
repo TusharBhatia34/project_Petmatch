@@ -38,8 +38,8 @@ fun CompleteProfileScreen(
            screenTitle = "Complete your profile",
            currentLocation = currLocation.value,
            buttonText = "Save",
-           buttonAction = { name,location,about,profilePicture ,locationInDouble->
-                          profileViewModel.saveProfile(name, location, about, profilePicture,locationInDouble)
+           buttonAction = { name,location,about,profilePicture ,locationInDouble,sameImage->
+                          profileViewModel.saveProfile(name, location, about, profilePicture,locationInDouble,sameImage)
            },
            responseAction = {
                navController.navigate(Routes.HomeScreen)

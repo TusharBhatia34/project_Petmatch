@@ -10,6 +10,7 @@ import com.example.petadoptionapp.domain.model.SavedPost
 import com.example.petadoptionapp.domain.repo.PostRepo
 import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.toObject
 import com.google.firebase.storage.storage
@@ -45,6 +46,7 @@ class PostRepoImp: PostRepo {
         try{
             val allPost = mutableListOf<Post>()
 db.collection(Collections.POSTS)
+    .orderBy("timestamp",Query.Direction.DESCENDING)
     .get()
     .addOnSuccessListener { snapshot->
         for (document in snapshot){
@@ -86,8 +88,6 @@ db.collection(Collections.POSTS)
                 .get()
                 .await()
                 for (document in result){
-
-
                     val savedPost = document.toObject<SavedPost>()
                     savedList.add(savedPost)
                 }
