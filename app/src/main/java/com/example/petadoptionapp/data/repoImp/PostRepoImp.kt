@@ -1,6 +1,5 @@
 package com.example.petadoptionapp.data.repoImp
 
-import android.util.Log
 import androidx.core.net.toUri
 import com.example.petadoptionapp.data.common.Collections
 import com.example.petadoptionapp.data.common.Response
@@ -23,12 +22,20 @@ class PostRepoImp: PostRepo {
   private  val db = Firebase.firestore
     private val storage = Firebase.storage
     override suspend fun createPost(post: Post): Response<Boolean> {
+
         try{
             val imageUrls = mutableListOf<String>()
-
             for(uri in post.photos){
-                imageUrls.add(uploadFile(uri))
+               val result =  uploadFile(post.authorId,post.timestamp.toString(),uri)
+                if(result.first){
+
+                    imageUrls.add(result.second)
+                }
+                else {
+                    return Response.Failure(Exception("Something went wrong."))
+                }
             }
+
             db.collection(Collections.POSTS)
                 .document("${post.authorId}_${post.timestamp.toDate()}_${post.timestamp.toDate().time}")
                 .set(post.copy(photos = imageUrls))
@@ -36,32 +43,83 @@ class PostRepoImp: PostRepo {
             return Response.Success(true)
         }
         catch(e:Exception){
+          deleteFile(post.authorId,post.timestamp.toString())
             return Response.Failure(e)
         }
 
+    }
+
+
+    override suspend fun editPost(post:Post,newImages:Boolean): Response<Boolean> {
+
+        try {
+            var imageUrls = post.photos.toMutableList()
+            if(newImages){
+                imageUrls = emptyList<String>().toMutableList()
+                for(uri in post.photos){
+
+                    val result =  uploadFile(post.authorId,post.timestamp.toString(),uri)
+                    if(result.first){
+                        imageUrls.add(result.second)
+                    }
+                    else {
+                        return Response.Failure(Exception("Something went wrong."))
+                    }
+                }
+            }
+            db.collection(Collections.POSTS)
+                .document("${post.authorId}_${post.timestamp.toDate()}_${post.timestamp.toDate().time}")
+                .set(post.copy(photos = imageUrls))
+                .await()
+            return Response.Success(true).also {
+                editSavedPostFromEveryUser(post.copy(photos = imageUrls))
+            }
+        }
+        catch (e:Exception){
+            return Response.Failure(e)
+        }
+
+    }
+    override suspend fun deletePost(authorId: String, timeStamp: Timestamp):Response<Boolean> {
+       try {
+           db.collection(Collections.POSTS)
+               .document("${authorId}_${timeStamp.toDate()}_${timeStamp.toDate().time}")
+               .delete()
+               .await()
+               deleteFile(authorId,timeStamp.toString())
+       return Response.Success(true).also {
+deleteSavedPostFromEveryUser(authorId,timeStamp)
+       }
+        }
+        catch (e:Exception){
+         return  Response.Failure(e)
+        }
     }
 
     override suspend fun getPost(): Flow<List<Post>> = callbackFlow {
 
         try{
             val allPost = mutableListOf<Post>()
+
 db.collection(Collections.POSTS)
-    .orderBy("timestamp",Query.Direction.DESCENDING)
+ .orderBy("timestamp", Query.Direction.DESCENDING)
     .get()
     .addOnSuccessListener { snapshot->
         for (document in snapshot){
             val post = document.toObject<Post>()
-            allPost.add(post)
+            if(post.authorId!=SharedComponents.currentUser!!.uid){
+                allPost.add(post)
+            }
+
         }
-
-
+        
         trySend(allPost)
     }
 
             trySend(emptyList())
         }
         catch (e:Exception){
-            Log.d("",e.toString())
+
         }
         awaitClose {  }
     }
@@ -144,10 +202,71 @@ db.collection(Collections.POSTS)
     }
 
 
-    private suspend fun uploadFile(fileUrl:String):String{
-        val ref = storage.reference.child("posts/${fileUrl}")
-        ref.putFile(fileUrl.toUri()).await()
-        return ref.downloadUrl.await().toString()
+
+    private suspend fun uploadFile(authorId:String,timeStamp:String,fileUrl:String):Pair<Boolean,String>{
+        try {
+            val ref = storage.reference.child("posts/${authorId}_${timeStamp}")
+            ref.putFile(fileUrl.toUri()).await()
+            return Pair(true,ref.downloadUrl.await().toString())
+        }
+        catch (e:Exception){
+            return Pair(false,"")
+        }
+
+    }
+
+    private fun deleteFile(authorId: String,timeStamp:String){
+        try{
+            val ref = storage.reference.child("posts/${authorId}_${timeStamp}")
+            ref.delete()
+
+        }
+        catch (_:Exception){}
+
+    }
+
+ private fun deleteSavedPostFromEveryUser(authorId: String,postTimestamp: Timestamp){
+db.collection(Collections.SAVED_POST)
+    .whereEqualTo("authorId",authorId)
+    .whereEqualTo("postTimestamp",postTimestamp)
+    .get()
+    .addOnCompleteListener {
+        if(it.isSuccessful){
+           for(doc in it.result.documents) {
+               db.collection(Collections.SAVED_POST)
+                   .document(doc.id)
+                   .delete()
+
+           }
+        }
+    }
+    }
+
+ private fun editSavedPostFromEveryUser(post:Post){
+db.collection(Collections.SAVED_POST)
+    .whereEqualTo("authorId",post.authorId)
+    .whereEqualTo("postTimestamp",post.timestamp)
+    .get()
+    .addOnCompleteListener {
+        if(it.isSuccessful){
+           for(doc in it.result.documents) {
+               db.collection(Collections.SAVED_POST)
+                   .document(doc.id)
+                   .update(mapOf(
+                       "age" to post.age,
+                       "breed" to post.breed,
+                       "description" to post.description,
+                       "gender" to post.gender,
+                       "healthInformation" to post.healthInformation,
+                       "location" to post.location,
+                       "photos" to post.photos,
+                       "type" to post.type,
+                       "name" to post.name
+                   ))
+
+           }
+        }
+    }
     }
 
 }

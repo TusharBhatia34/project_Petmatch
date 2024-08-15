@@ -3,7 +3,6 @@
 package com.example.petadoptionapp.presentation.screens
 
 import android.net.Uri
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -13,7 +12,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -75,6 +73,7 @@ import com.example.petadoptionapp.data.common.Response
 import com.example.petadoptionapp.data.common.Routes
 import com.example.petadoptionapp.data.common.SharedComponents
 import com.example.petadoptionapp.domain.model.Post
+import com.example.petadoptionapp.presentation.viewModels.MyPostViewModel
 import com.example.petadoptionapp.presentation.viewModels.PostViewModel
 import com.example.petadoptionapp.ui.theme.AppTheme
 import com.example.petadoptionapp.ui.theme.quickSand
@@ -87,32 +86,37 @@ import java.util.Date
 fun PostScreen(
     navController: NavController,
     postScreenViewModel: PostViewModel = hiltViewModel(),
+    myPostViewModel: MyPostViewModel = hiltViewModel(),
+    post: Post = Post(),
+    editScreen:Boolean = false,
     ) {
     val currLocation = postScreenViewModel.location.collectAsState()
 
-    val response = postScreenViewModel.createPostResponse.collectAsStateWithLifecycle()
+    val createPostResponse = postScreenViewModel.createPostResponse.collectAsStateWithLifecycle()
+    val editPostResponse = myPostViewModel.editPostResponse.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val animalTypes by rememberSaveable { mutableStateOf(listOf("Dog","Cat","Bird")) }
-    val gender by rememberSaveable { mutableStateOf(listOf("Male","Female"))}
-    var breedField by rememberSaveable { mutableStateOf("") }
-    var locationField by rememberSaveable { mutableStateOf("") }
-    var descriptionField by rememberSaveable { mutableStateOf("") }
-    var birthDateField by rememberSaveable { mutableStateOf("") }
-    var selectedAnimal by rememberSaveable { mutableStateOf("") }
-    var selectedGender by rememberSaveable { mutableStateOf("") }
-    var selectedImages by rememberSaveable { mutableStateOf<List<Uri>>(emptyList())}
-    var healthInformationField by rememberSaveable { mutableStateOf("") }
+    val genders by rememberSaveable { mutableStateOf(listOf("Male","Female"))}
+    var breedField by rememberSaveable { mutableStateOf(post.breed) }
+    var locationField by rememberSaveable { mutableStateOf(post.location) }
+    var descriptionField by rememberSaveable { mutableStateOf(post.description) }
+    var birthDateField by rememberSaveable { mutableStateOf(post.age) }
+    var selectedAnimal by rememberSaveable { mutableStateOf(post.type) }
+    var selectedGender by rememberSaveable { mutableStateOf(post.gender) }
+    var selectedImages by rememberSaveable { mutableStateOf(post.photos)}
+    var healthInformationField by rememberSaveable { mutableStateOf(post.healthInformation) }
     var isClicked by rememberSaveable{ mutableStateOf(false)}
-    var name by rememberSaveable{ mutableStateOf("")}
+    var nameField by rememberSaveable{ mutableStateOf(post.name)}
     var showDatePicker by rememberSaveable {
         mutableStateOf(false)
     }
     val interactionSource = remember{ MutableInteractionSource() }
-
+    val editedValues = selectedAnimal !=post.type || selectedGender!=post.gender || nameField!=post.name || breedField != post.breed || birthDateField!=post.age ||
+            locationField!=post.location || descriptionField != post.description || healthInformationField != post.healthInformation || selectedImages!=post.photos
 
 val multiImagesPicker = rememberLauncherForActivityResult(
     contract = ActivityResultContracts.PickMultipleVisualMedia(3),
-    onResult = {uris: List<Uri> -> selectedImages = uris;Log.d("selected",selectedImages.toString()) }
+    onResult = {uris: List<Uri> -> selectedImages = uris.map {it.toString() }}
 )
 
     if (showDatePicker) {
@@ -130,10 +134,30 @@ val multiImagesPicker = rememberLauncherForActivityResult(
                             onClick = {
 
                                 if (selectedGender==""||selectedAnimal=="" || selectedImages.isEmpty()
-                                    ||breedField==""||locationField==""||descriptionField==""||birthDateField==""||healthInformationField==""||name ==""){
+                                    ||breedField==""||locationField==""||descriptionField==""||birthDateField==""||healthInformationField==""||nameField ==""){
                                     Toast.makeText(context,"Fill all details.",Toast.LENGTH_SHORT).show()
                                 }
-                                else{
+                                else if(editScreen){
+                                    isClicked = true
+                                   myPostViewModel.editPost(
+                                       Post(
+                                           age = birthDateField,
+                                           authorId = SharedComponents.currentUser!!.uid,
+                                           breed = breedField,
+                                           description = descriptionField,
+                                           gender = selectedGender,
+                                           location = locationField,
+                                           photos = selectedImages,
+                                           timestamp = SharedComponents.timeStamp,
+                                           type = selectedAnimal,
+                                           healthInformation = healthInformationField,
+                                           name = nameField
+                                           ),
+                                           newImages = post.photos != selectedImages
+                                   )
+                                }
+                                else {
+                                    isClicked = true
                                     postScreenViewModel.createPost(
                                         Post(
                                             age = birthDateField,
@@ -142,11 +166,11 @@ val multiImagesPicker = rememberLauncherForActivityResult(
                                             description = descriptionField,
                                             gender = selectedGender,
                                             location = locationField,
-                                            photos = selectedImages.map {it.toString() },
+                                            photos = selectedImages,
                                             timestamp = Timestamp.now(),
                                             type = selectedAnimal,
                                             healthInformation = healthInformationField,
-                                            name = name
+                                            name = nameField
                                         )
                                     )
 
@@ -156,12 +180,16 @@ val multiImagesPicker = rememberLauncherForActivityResult(
 
                             colors = ButtonDefaults.textButtonColors(
                                 containerColor = MaterialTheme.colorScheme.primary,
-                                contentColor = MaterialTheme.colorScheme.onPrimary
+                                contentColor = MaterialTheme.colorScheme.onPrimary,
+                                disabledContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                                disabledContentColor = MaterialTheme.colorScheme.onTertiaryContainer
                             ),
                             shape = RoundedCornerShape(8.dp)
-                            ,modifier = Modifier.padding(top = 4.dp,end = AppTheme.dimens.mediumLarge)
+                            ,modifier = Modifier.padding(top = 4.dp,end = AppTheme.dimens.mediumLarge),
+                            enabled = !editScreen || editedValues
                         ) {
-                            Text(text = "post", color = MaterialTheme.colorScheme.onPrimary)
+                            Text(text = if(editScreen)"save" else "post", fontWeight = FontWeight.Bold,
+                                fontFamily = quickSand)
                         }
 
                 },
@@ -183,14 +211,7 @@ val multiImagesPicker = rememberLauncherForActivityResult(
             .padding(top = padding.calculateTopPadding())
             .verticalScroll(rememberScrollState())
         ) {
-            Row (modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ){
 
-
-
-            }
 
             Spacer(modifier = Modifier.height(AppTheme.dimens.mediumLarge))
 
@@ -199,7 +220,8 @@ val multiImagesPicker = rememberLauncherForActivityResult(
                     val selected = value == selectedAnimal
                     FilterChip(selected =  selected ,
                         onClick = { selectedAnimal=value },
-                        label = { Text(text = value)},
+                        label = { Text(text = value,fontWeight = FontWeight.SemiBold,
+                            fontFamily = quickSand)},
                         leadingIcon = if (selected) {
                             {
                                 Icon(
@@ -216,10 +238,10 @@ val multiImagesPicker = rememberLauncherForActivityResult(
                 }
             }
             Row (modifier = Modifier.fillMaxWidth()){
-                gender.forEach { value->
+                genders.forEach { value->
                     FilterChip(selected =  value==selectedGender ,
                         onClick = { selectedGender=value},
-                        label = { Text(text = value)},
+                        label = { Text(text = value, fontFamily = quickSand,fontWeight = FontWeight.SemiBold)},
                         leadingIcon = if (value==selectedGender) {
                             {
                                 Icon(
@@ -238,7 +260,7 @@ val multiImagesPicker = rememberLauncherForActivityResult(
             Spacer(modifier = Modifier.height(AppTheme.dimens.mediumLarge))
 
             OutlinedTextField(
-                value = name, onValueChange = {name = it}, colors = OutlinedTextFieldDefaults.colors(
+                value = nameField, onValueChange = {nameField = it}, colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor =  MaterialTheme.colorScheme.primaryContainer,
                     unfocusedBorderColor = MaterialTheme.colorScheme.primary
                 ),
@@ -416,18 +438,44 @@ val multiImagesPicker = rememberLauncherForActivityResult(
                 }
 
             }
-            LaunchedEffect(response.value) {
-                when(val postResponse =response.value){
+            LaunchedEffect(editPostResponse.value) {
+                when(val postResponse =editPostResponse.value){
                     is Response.Failure -> {
+                        isClicked = false
                         Toast.makeText(context,postResponse.e.message,Toast.LENGTH_SHORT).show()
+                        myPostViewModel.resetValue()
                     }
-                    Response.Loading -> isClicked = true
-                    is Response.Success ->
-                        if(postResponse.data) {
-                            isClicked = false
-                            postScreenViewModel.resetValue()
-                            navController.navigate(Routes.HomeScreen)
+                    Response.Loading -> {}
+                    is Response.Success ->{
+                        isClicked = false
+                        navController.navigate(Routes.MyPostsScreen){
+                            popUpTo(Routes.MyPostsScreen){inclusive = true}
                         }
+                        myPostViewModel.resetValue()
+
+                    }
+
+
+
+                }
+
+
+            }
+            LaunchedEffect(createPostResponse.value) {
+                when(val postResponse =createPostResponse.value){
+                    is Response.Failure -> {
+                        isClicked = false
+                        Toast.makeText(context,postResponse.e.message,Toast.LENGTH_SHORT).show()
+                        postScreenViewModel.resetValue()
+                    }
+                    Response.Loading -> {}
+                    is Response.Success ->{
+                        isClicked = false
+                        navController.navigate(Routes.HomeScreen)
+                        postScreenViewModel.resetValue()
+                    }
+
+
                 }
 
 

@@ -33,7 +33,18 @@ object Routes {
     @Serializable
     object EditProfileScreen
     @Serializable
-    data class ProfileScreenRoute(val location: String)
+    data class EditPostScreenRoute(
+        val age:String ="",
+        val breed:String="",
+        val description:String="",
+        val gender:String="",
+        val healthInformation:String="",
+        val location:String="",
+        val photos:List<String> =emptyList(),
+        val name:String="",
+        val authorId:String = "",
+        val type:String=""
+    )
 
     @Serializable
     data class PostDetailsScreen(
@@ -57,6 +68,7 @@ object Routes {
     object ProfileSettingScreen
     @Serializable
     object MyPostsScreen
+
 
     @Serializable
     data class MyPostDetailsScreen(

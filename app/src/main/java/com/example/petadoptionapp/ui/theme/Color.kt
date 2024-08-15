@@ -14,6 +14,10 @@ val onSurfaceLight = Color(0xFF)
 val secondaryContainerLight = Color(0xFFFFDAD9)
 val onSecondaryContainerLight = Color(0xFF3C070D)
 val inversePrimaryLight = Color(0xFF3C070D)
+val disableButtonColorLight = Color(0xFFE0DBDC)
+val disableButtonTextColorLight = Color(0xFF8B8888)
+
+
 
 
 val surfaceDark = Color(0xFF1A1111)
@@ -23,7 +27,8 @@ val secondaryContainerDark = Color(0xFF5D3F3F)
 val surfaceContainerDark = Color(0xFF291E1F)
 val onSecondaryContainerDark = Color(0xFFFFDAD9)
 val inversePrimaryDark = Color(0xFFF593A1)
-
+val disableButtonColorDark = Color(0xFF47393A)
+val disableButtonTextColorDark = Color(0xFF8D8485)
 
 val secondaryLight = Color(0xFF76565A)
 val onSecondaryLight = Color(0xFFFFFFFF)
@@ -90,7 +95,7 @@ val surfaceContainerLowestDark = Color(0xFF140C0D)
 val surfaceContainerLowDark = Color(0xFF22191A)
 
 val surfaceContainerHighDark = Color(0xFF312829)
-val gj = Color(0xFF3D3233)
+
 
 
 val on = Color(0xFFFFC2C8)

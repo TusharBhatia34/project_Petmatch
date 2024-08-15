@@ -27,7 +27,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -63,7 +62,7 @@ Scaffold(
         TopAppBar(
             title = { 
                 Text(
-                text = "Application form",
+                text = "Application",
                     fontWeight = FontWeight.Bold,
                     fontFamily = quickSand,
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
@@ -118,7 +117,7 @@ if(post!=null){
                     shape = RoundedCornerShape(8.dp),
                     modifier = Modifier.padding(end = 4.dp)
                 ) {
-                    Text(text = "View post")
+                    Text(text = "View post", fontWeight = FontWeight.Bold, fontFamily = quickSand)
                 }
             }
 

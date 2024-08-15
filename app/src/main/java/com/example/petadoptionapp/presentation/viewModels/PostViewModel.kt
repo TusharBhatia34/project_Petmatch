@@ -47,7 +47,7 @@ class PostViewModel @Inject constructor(
     private val _post = MutableStateFlow<List<Post>>(emptyList())
     val post = _post.asStateFlow()
 
-    private val _createPostResponse = MutableStateFlow<Response<Boolean>>(Response.Success(false))
+    private val _createPostResponse = MutableStateFlow<Response<Boolean>>(Response.Loading)
     val createPostResponse = _createPostResponse.asStateFlow()
 
     private val _saveOrUnsavePostResponse = MutableStateFlow<Response<Boolean>>(Response.Loading)
@@ -74,7 +74,7 @@ class PostViewModel @Inject constructor(
         if(applicationContext.hasLocationPermission()){
             getPost()
             getSavedPost()
-      getCurrentLocation()
+            getCurrentLocation()
             getProfileLocationLocally()
     }
     }
@@ -115,7 +115,6 @@ class PostViewModel @Inject constructor(
         viewModelScope.launch {
           _createPostResponse.value =  postCreationUseCase.invoke(post)
         }
-        _createPostResponse.value  = Response.Loading
     }
 
    private fun getPost(){

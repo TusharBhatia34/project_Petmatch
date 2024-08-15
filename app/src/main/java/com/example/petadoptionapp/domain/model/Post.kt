@@ -12,7 +12,8 @@ data class Post(
     val healthInformation:String="",
     val location:String="",
     val photos:List<String> = emptyList(),
-    val timestamp: Timestamp= Timestamp.now(),
     val type:String="",
-    val name:String =""
+    val name:String ="",
+    val timestamp:Timestamp = Timestamp.now(),
     )
+

@@ -130,8 +130,9 @@ Box(modifier = Modifier.fillMaxSize()){
                         )
                     )
                 }
+                postViewModel.getSavedPost()
             }
-            postViewModel.getSavedPost()
+
             navController.popBackStack()
         }
         Column(

@@ -33,7 +33,6 @@ import com.example.petadoptionapp.presentation.screens.ViewProfileScreen
 import com.example.petadoptionapp.presentation.viewModels.PostViewModel
 import com.example.petadoptionapp.presentation.viewModels.ProfileViewModel
 
-/*Routes.ProfileScreenRoute("location")*/
 
 @Composable
 fun NavGraph(navController: NavHostController,activity: Activity,modifier:Modifier = Modifier) {
@@ -153,6 +152,25 @@ val post = Post(
         ApplicationFormScreen(applicationAnswersScreen = applicationAnswersScreen, answersList =answersList , navController =navController,authorId= authorId )
     }
 
+    composable<Routes.EditPostScreenRoute>{
+        val post = Post(
+            age = it.toRoute<Routes.EditPostScreenRoute>().age,
+            breed = it.toRoute<Routes.EditPostScreenRoute>().breed,
+            description = it.toRoute<Routes.EditPostScreenRoute>().description,
+            gender = it.toRoute<Routes.EditPostScreenRoute>().gender,
+            healthInformation = it.toRoute<Routes.EditPostScreenRoute>().healthInformation,
+            name = it.toRoute<Routes.EditPostScreenRoute>().name,
+            photos = it.toRoute<Routes.EditPostScreenRoute>().photos,
+            location = it.toRoute<Routes.EditPostScreenRoute>().location,
+            authorId = it.toRoute<Routes.EditPostScreenRoute>().authorId,
+            type = it.toRoute<Routes.EditPostScreenRoute>().type,
+        )
+        PostScreen(
+        navController = navController,
+        post =  post,
+        editScreen = true
+        )
+    }
 }
 }
 

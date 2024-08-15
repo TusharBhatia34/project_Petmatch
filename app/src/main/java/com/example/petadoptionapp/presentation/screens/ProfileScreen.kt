@@ -6,6 +6,7 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -107,7 +108,7 @@ Scaffold (
                 if(enabled){
                     if(usernameField!=""&&aboutField !=""&&locationField!=""){
                         isClicked = true
-val sameImage = initialProfilePictureField == profilePictureField
+            val sameImage = initialProfilePictureField == profilePictureField
                         buttonAction(usernameField, locationField, aboutField,profilePictureField ,locationInDouble,sameImage)
                     }
                     else {
@@ -207,6 +208,7 @@ val sameImage = initialProfilePictureField == profilePictureField
                                 PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                             )
                         })
+                        .border(width = 3.dp,color = MaterialTheme.colorScheme.surface,shape = CircleShape)
                 )
             }
         }

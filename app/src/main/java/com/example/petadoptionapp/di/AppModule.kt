@@ -27,6 +27,8 @@ import com.example.petadoptionapp.domain.usecases.auth.ResetPasswordUseCase
 import com.example.petadoptionapp.domain.usecases.auth.SignInUseCase
 import com.example.petadoptionapp.domain.usecases.auth.SignOutUseCase
 import com.example.petadoptionapp.domain.usecases.auth.SignUpUseCase
+import com.example.petadoptionapp.domain.usecases.post.DeletePostUseCase
+import com.example.petadoptionapp.domain.usecases.post.EditPostUseCase
 import com.example.petadoptionapp.domain.usecases.post.GetMyPostsUseCase
 import com.example.petadoptionapp.domain.usecases.post.GetPostUseCase
 import com.example.petadoptionapp.domain.usecases.post.PostCreationUseCase
@@ -60,6 +62,16 @@ object AppModule {
     @Singleton
    fun providePostCreationUseCase(postRepo: PostRepo):PostCreationUseCase{
        return PostCreationUseCase(postRepo)
+   }
+    @Provides
+    @Singleton
+   fun provideEditPostUseCase(postRepo: PostRepo): EditPostUseCase {
+       return EditPostUseCase(postRepo)
+   }
+    @Provides
+    @Singleton
+   fun provideDeletePostUseCase(postRepo: PostRepo): DeletePostUseCase {
+       return DeletePostUseCase(postRepo)
    }
     @Provides
     @Singleton

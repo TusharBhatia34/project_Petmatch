@@ -28,6 +28,8 @@ private val DarkColorScheme = darkColorScheme(
     onSecondaryContainer = onSecondaryContainerDark,
     inversePrimary = inversePrimaryDark,
     onSurface = Color.White,
+    tertiaryContainer = disableButtonColorDark,
+    onTertiaryContainer = disableButtonTextColorDark
 
 )
 
@@ -43,6 +45,8 @@ private val LightColorScheme = lightColorScheme(
     onSecondaryContainer = onSecondaryContainerLight,
     inversePrimary = inversePrimaryLight,
     onSurface = Color.Black,
+    tertiaryContainer = disableButtonColorLight,
+    onTertiaryContainer = disableButtonTextColorLight
 
 
 
