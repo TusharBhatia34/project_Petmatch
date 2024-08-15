@@ -13,13 +13,14 @@ The main functionalities of **Pet Match** are complete and operational, includin
 - Application review by pet owners
 - user can view their own posts
 - user can update their profile
+- user can edit/delete their own post
 
 However, several features are still under development or planned for future updates:
 
 - Searching and filtering options for pet listings
 - Terms and conditions integration
 - Viewing of user's own applied applications
-- Post deletion and account deletion capabilities
+- account deletion 
 - Additional enhancements and functionalities
 
 I am actively working on these features and will update the status as development progresses. Contributions and feedback are welcome to help improve the app.
