@@ -18,7 +18,7 @@ class DefaultLocationClient(
     private val client: FusedLocationProviderClient
 ){
 
-    fun emptyLocation(): Location {
+  private  fun emptyLocation(): Location {
         val location = Location(LocationManager.PASSIVE_PROVIDER)
         location.latitude = 0.0
         location.longitude = 0.0
@@ -26,41 +26,46 @@ class DefaultLocationClient(
     }
     @SuppressLint("MissingPermission")
      suspend fun getLocationUpdates(): Pair<Location, Response<Boolean>>{
+try {
+    if(!context.hasLocationPermission()) {
+        return Pair(emptyLocation(), Response.Failure(Exception("locationPermission")))
+    }
 
-            if(!context.hasLocationPermission()) {
-                return Pair(emptyLocation(), Response.Failure(Exception("locationPermission")))
+    val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+    val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+    val isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+    if(!isGpsEnabled && !isNetworkEnabled) {
+        return Pair(emptyLocation(), Response.Failure(Exception("gps")))
+    }
+
+    val request = LocationRequest.create()
+
+
+
+    val locationDeferred = CompletableDeferred<Location>()
+    val locationCallback = object : LocationCallback() {
+        override fun onLocationResult(result: LocationResult) {
+
+            super.onLocationResult(result)
+            result.locations.lastOrNull()?.let {location ->
+                locationDeferred.complete(location)
             }
+        }
+    }
 
-            val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-            val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-            val isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
-            if(!isGpsEnabled && !isNetworkEnabled) {
-                return Pair(emptyLocation(), Response.Failure(Exception("gps")))
-            }
+    client.requestLocationUpdates(
+        request,
+        locationCallback,
+        Looper.getMainLooper()
+    ).await()
 
-            val request = LocationRequest.create()
+    val currentLocation: Location = locationDeferred.await()
+    return Pair(currentLocation, Response.Success(true))
 
-
-
-        val locationDeferred = CompletableDeferred<Location>()
-            val locationCallback = object : LocationCallback() {
-                override fun onLocationResult(result: LocationResult) {
-
-                    super.onLocationResult(result)
-                    result.locations.lastOrNull()?.let {location ->
-                        locationDeferred.complete(location)
-                    }
-                }
-            }
-
-            client.requestLocationUpdates(
-                request,
-                locationCallback,
-                Looper.getMainLooper()
-            ).await()
-
-        val currentLocation: Location = locationDeferred.await()
-        return Pair(currentLocation, Response.Success(true))
+}
+catch (e:Exception){
+    return Pair(emptyLocation(), Response.Failure(Exception("There is some issue.")))
+}
 
 
     }

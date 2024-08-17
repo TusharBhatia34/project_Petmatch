@@ -72,8 +72,12 @@ class PostViewModel @Inject constructor(
 
     init {
         if(applicationContext.hasLocationPermission()){
-            getPost()
-            getSavedPost()
+
+if(SharedComponents.currentUser!=null){
+    getPost()
+    getSavedPost()
+}
+
             getCurrentLocation()
             getProfileLocationLocally()
     }
@@ -117,7 +121,7 @@ class PostViewModel @Inject constructor(
         }
     }
 
-   private fun getPost(){
+    fun getPost(){
         viewModelScope.launch(Dispatchers.IO) {
             getPostUseCase.invoke().collect{
                 _post.value = it

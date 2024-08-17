@@ -56,6 +56,7 @@ import com.example.petadoptionapp.data.common.Routes
 import com.example.petadoptionapp.data.common.SharedComponents
 import com.example.petadoptionapp.presentation.components.PetBackgroundContainer
 import com.example.petadoptionapp.presentation.viewModels.AuthViewModel
+import com.example.petadoptionapp.presentation.viewModels.PostViewModel
 import com.example.petadoptionapp.presentation.viewModels.ProfileViewModel
 import com.example.petadoptionapp.ui.theme.quickSand
 
@@ -65,6 +66,7 @@ fun SignInScreen(
     navController: NavController,
     authViewModel: AuthViewModel = hiltViewModel(),
     profileViewModel: ProfileViewModel = hiltViewModel(),
+    postViewModel: PostViewModel
 ) {
     var email by rememberSaveable{mutableStateOf("")}
     var password by rememberSaveable{mutableStateOf("")}
@@ -223,6 +225,8 @@ textStyle = TextStyle(fontWeight = FontWeight.SemiBold, fontFamily = quickSand),
                 Response.Loading -> {}
                 is Response.Success -> {
                     isClicked =false
+                    postViewModel.getPost()
+                    postViewModel.getSavedPost()
                     if (response.data){
 
                         navController.navigate(Routes.HomeScreen){

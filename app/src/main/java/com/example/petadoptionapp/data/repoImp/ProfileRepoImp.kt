@@ -18,28 +18,35 @@ import javax.inject.Inject
 
 class ProfileRepoImp @Inject constructor(
     private val userDatastore: UserDatastore
+
 ): ProfileRepo {
     private val db = Firebase.firestore
+
     private val storage = Firebase.storage
 
+
     override suspend fun editProfile() {
-        TODO("Not yet implemented")
+
     }
 
     override suspend fun saveProfile(userProfile: UserProfile,sameImage:Boolean): Response<Boolean> {
         try {
             var imageUrl = userProfile.profilePicture
+
+
             if(!sameImage){
+
               imageUrl = uploadProfilePicture(userProfile.profilePicture)
                           }
 
 
-
             val profile = userProfile.copy(profilePicture = imageUrl)
-            db.collection(Collections.USERS)
+          db.collection(Collections.USERS)
                 .document(SharedComponents.currentUser!!.uid)
                 .set(profile)
-                .await()
+              .await()
+
+
             userDatastore.saveProfileInfo(profile)
             return Response.Success(true) // profile saved successfully
         }
@@ -70,7 +77,7 @@ class ProfileRepoImp @Inject constructor(
 
 
     private suspend fun uploadProfilePicture(imageUrl:String):String{
-        val ref = storage.reference.child("users/${imageUrl}")
+        val ref = storage.reference.child("images/${SharedComponents.currentUser!!.uid}/ProfilePicture")
         ref.putFile(imageUrl.toUri()).await()
         return ref.downloadUrl.await().toString()
     }

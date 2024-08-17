@@ -16,4 +16,6 @@ interface AuthRepo {
 
     suspend fun resendVerificationEmail():Response<Boolean>
 
+    suspend fun deleteUserAccount(authorId:String)
+
 }

@@ -21,6 +21,7 @@ import com.example.petadoptionapp.domain.usecases.application.GetApplicationsUse
 import com.example.petadoptionapp.domain.usecases.application.GetAppliedApplicationsUseCase
 import com.example.petadoptionapp.domain.usecases.application.SendingApplicationUseCase
 import com.example.petadoptionapp.domain.usecases.auth.DeleteNotVerifiedUserUseCase
+import com.example.petadoptionapp.domain.usecases.auth.DeleteUserAccountUseCase
 import com.example.petadoptionapp.domain.usecases.auth.ReloadUserUseCases
 import com.example.petadoptionapp.domain.usecases.auth.ResendVerificationEmailUseCase
 import com.example.petadoptionapp.domain.usecases.auth.ResetPasswordUseCase
@@ -80,7 +81,7 @@ object AppModule {
     }
     @Provides
     @Singleton
-    fun provideProfileRepo(userDatastore: UserDatastore): ProfileRepo {
+    fun provideProfileRepo(userDatastore:UserDatastore): ProfileRepo {
         return ProfileRepoImp(userDatastore)
     }
     @Provides
@@ -122,6 +123,11 @@ object AppModule {
     @Singleton
     fun provideResetPasswordUseCase(authRepo: AuthRepo): ResetPasswordUseCase {
         return  ResetPasswordUseCase(authRepo)
+    }
+    @Provides
+    @Singleton
+    fun provideDeleteUserAccountUseCase(authRepo: AuthRepo): DeleteUserAccountUseCase {
+        return  DeleteUserAccountUseCase(authRepo)
     }
     @Provides
     @Singleton

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.petadoptionapp.data.common.Response
 import com.example.petadoptionapp.domain.usecases.auth.DeleteNotVerifiedUserUseCase
+import com.example.petadoptionapp.domain.usecases.auth.DeleteUserAccountUseCase
 import com.example.petadoptionapp.domain.usecases.auth.ReloadUserUseCases
 import com.example.petadoptionapp.domain.usecases.auth.ResendVerificationEmailUseCase
 import com.example.petadoptionapp.domain.usecases.auth.ResetPasswordUseCase
@@ -25,7 +26,8 @@ class AuthViewModel @Inject constructor(
     private val signOutUseCase: SignOutUseCase,
     private val resetPasswordUseCase: ResetPasswordUseCase,
     private val deleteNotVerifiedUserUseCase: DeleteNotVerifiedUserUseCase,
-    private val resendVerificationEmailUseCase: ResendVerificationEmailUseCase
+    private val resendVerificationEmailUseCase: ResendVerificationEmailUseCase,
+    private val deleteUserAccountUseCase: DeleteUserAccountUseCase
 ):ViewModel() {
 
     private var _isUserSignedUp =MutableStateFlow<Response<Boolean>>(Response.Loading)
@@ -93,6 +95,12 @@ class AuthViewModel @Inject constructor(
     fun deleteNotVerifiedUser(){
         viewModelScope.launch {
             _notVerifiedUserDeletedResponse.value = deleteNotVerifiedUserUseCase.invoke()
+        }
+    }
+
+    fun deleteUserAccount(){
+        viewModelScope.launch(Dispatchers.IO) {
+            deleteUserAccountUseCase.invoke()
         }
     }
 }

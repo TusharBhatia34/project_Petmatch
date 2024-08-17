@@ -54,7 +54,7 @@ composable<Routes.CompleteProfileScreen> {
 CompleteProfileScreen(activity = activity, navController = navController)
 }
     composable<Routes.SignInScreen>{
-        SignInScreen(navController = navController)
+        SignInScreen(navController = navController,postViewModel =postViewModel)
     }
 
     composable<Routes.SignUpScreen>{

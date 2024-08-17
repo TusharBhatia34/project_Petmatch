@@ -79,7 +79,6 @@ class ProfileViewModel @Inject constructor(
 
     fun checkProfileExists(){
         viewModelScope.launch {
-            Log.d("checking","2")
            _profileExistsResponse.value = profileExistsUseCase.invoke()
         }
     }
@@ -111,7 +110,6 @@ class ProfileViewModel @Inject constructor(
 
     ){
         val splitLocation = location.split(",")
-        Log.d("profile", "${splitLocation[0]},${splitLocation[1]},${splitLocation[2]} viewmodel")
 
         val userProfile = UserProfile(
             name = name,

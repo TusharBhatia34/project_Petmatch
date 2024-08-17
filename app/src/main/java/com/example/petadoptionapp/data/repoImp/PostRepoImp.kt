@@ -100,7 +100,6 @@ deleteSavedPostFromEveryUser(authorId,timeStamp)
 
         try{
             val allPost = mutableListOf<Post>()
-
 db.collection(Collections.POSTS)
  .orderBy("timestamp", Query.Direction.DESCENDING)
     .get()
@@ -108,6 +107,7 @@ db.collection(Collections.POSTS)
         for (document in snapshot){
             val post = document.toObject<Post>()
             if(post.authorId!=SharedComponents.currentUser!!.uid){
+
                 allPost.add(post)
             }
 
@@ -120,6 +120,7 @@ db.collection(Collections.POSTS)
         }
         catch (e:Exception){
 
+trySend(emptyList())
         }
         awaitClose {  }
     }
@@ -128,7 +129,7 @@ db.collection(Collections.POSTS)
 
         try{
             db.collection(Collections.SAVED_POST)
-                .document("${savedPost.authorId}_${savedPost.savedBy}_${savedPost.postTimestamp}")
+                .document("${savedPost.savedBy}_${savedPost.authorId}_${savedPost.postTimestamp}")
                 .set(savedPost)
                 .await()
             return Response.Success(true)
@@ -150,8 +151,6 @@ db.collection(Collections.POSTS)
                     savedList.add(savedPost)
                 }
                 SharedComponents.savedList = savedList
-
-
             return Response.Success(true)
         }
         catch(e:Exception){
@@ -161,15 +160,12 @@ db.collection(Collections.POSTS)
 
     override suspend fun removeSavedPost(
         authorId: String,
-        postTimestamp: Timestamp,
+        timeStamp: Timestamp,
         savedBy: String,
     ): Response<Boolean> {
         try {
-
-
-
          db.collection(Collections.SAVED_POST)
-              .document("${authorId}_${savedBy}_${postTimestamp}")
+              .document("${savedBy}_${authorId}_${timeStamp}")
               .delete()
               .await()
 
@@ -205,7 +201,7 @@ db.collection(Collections.POSTS)
 
     private suspend fun uploadFile(authorId:String,timeStamp:String,fileUrl:String):Pair<Boolean,String>{
         try {
-            val ref = storage.reference.child("posts/${authorId}_${timeStamp}")
+            val ref = storage.reference.child("images/${authorId}/${authorId}_${timeStamp}")
             ref.putFile(fileUrl.toUri()).await()
             return Pair(true,ref.downloadUrl.await().toString())
         }
@@ -217,7 +213,7 @@ db.collection(Collections.POSTS)
 
     private fun deleteFile(authorId: String,timeStamp:String){
         try{
-            val ref = storage.reference.child("posts/${authorId}_${timeStamp}")
+            val ref = storage.reference.child("images/${authorId}/${authorId}_${timeStamp}")
             ref.delete()
 
         }

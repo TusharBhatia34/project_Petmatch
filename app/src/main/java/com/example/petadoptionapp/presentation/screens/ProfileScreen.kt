@@ -108,7 +108,7 @@ Scaffold (
                 if(enabled){
                     if(usernameField!=""&&aboutField !=""&&locationField!=""){
                         isClicked = true
-            val sameImage = initialProfilePictureField == profilePictureField
+                        val sameImage = initialProfilePictureField == profilePictureField
                         buttonAction(usernameField, locationField, aboutField,profilePictureField ,locationInDouble,sameImage)
                     }
                     else {
@@ -150,9 +150,12 @@ Scaffold (
             textAlign = TextAlign.Start
         )  },
             navigationIcon = {
-                IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(imageVector = Icons.Default.ArrowBackIosNew, contentDescription = null )
+                if(screenTitle !="Complete your profile"){
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(imageVector = Icons.Default.ArrowBackIosNew, contentDescription = null )
+                    }
                 }
+
             })
     }
 ){ padding ->

@@ -1,5 +1,6 @@
 package com.example.petadoptionapp.data.repoImp
 
+import com.example.petadoptionapp.data.common.Collections
 import com.example.petadoptionapp.data.common.Response
 import com.example.petadoptionapp.data.common.SharedComponents
 import com.example.petadoptionapp.data.local.cachingAppliedApplications.Database
@@ -8,7 +9,9 @@ import com.example.petadoptionapp.domain.repo.AuthRepo
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.storage
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,10 +22,12 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class AuthRepoImp @Inject constructor(
-    private val db:Database,
+    private val roomDb:Database,
     private val userDatastore: UserDatastore
 ): AuthRepo {
-private var auth = Firebase.auth
+    private var auth = Firebase.auth
+    private  val db = com.google.firebase.Firebase.firestore
+    private val storage = com.google.firebase.Firebase.storage
     override suspend fun createUser(email: String, password: String): StateFlow<Response<Boolean>> {
             try{
                 val response: MutableStateFlow<Response<Boolean>> = MutableStateFlow(Response.Loading)
@@ -60,11 +65,11 @@ private var auth = Firebase.auth
                             }
 
             catch (e: FirebaseAuthInvalidUserException){
-Response.Failure(Exception("User does not exist"))
+                    trySend(Response.Failure(Exception("User does not exist")))
 
             }
                             catch (e: FirebaseAuthInvalidCredentialsException){
-                                Response.Failure(e)
+                             trySend(Response.Failure(e))
 
                             }
                         }
@@ -99,8 +104,7 @@ trySend(Response.Failure(e))
         auth.signOut()
         SharedComponents.currentUser = null
         userDatastore.clearDataStore()
-        db.clearAllTables()
-
+        roomDb.clearAllTables()
     }
 
     override suspend fun resetPassword(email: String): Flow<Response<Boolean>> =  callbackFlow {
@@ -139,7 +143,92 @@ trySend(Response.Failure(e))
         }
 
     }
+
+    override suspend fun deleteUserAccount(authorId:String) {
+        try {
+            auth.currentUser!!.delete().await()
+            deleteEveryPost(authorId)
+            SharedComponents.currentUser = null
+            userDatastore.clearDataStore()
+            roomDb.clearAllTables()
+        }
+        catch (_:Exception){
+            println("error occur.")
+        }
+    }
+    private  fun deleteEveryPost(authorId: String){
+
+            db.collection(Collections.POSTS)
+                .whereEqualTo("authorId",authorId)
+                .get()
+                .addOnCompleteListener {
+                    if(it.isSuccessful){
+                        for(doc in it.result.documents){
+                            db.collection(Collections.POSTS)
+                                .document(doc.id)
+                                .delete()
+                        }
+
+                deleteEverySavedPost(authorId)
+                deleteEveryPhotos(authorId)
+
+                    }
+
+                }
+    }
+    private  fun deleteEverySavedPost(authorId: String){
+
+        db.collection(Collections.SAVED_POST)
+            .whereEqualTo("authorId",authorId)
+            .get()
+            .addOnCompleteListener {
+                if(it.isSuccessful){
+
+                    for(doc in it.result.documents){
+
+                        db.collection(Collections.SAVED_POST)
+                            .document(doc.id)
+                            .delete()
+                    }
+
+                db.collection(Collections.USERS)
+                    .document(authorId)
+                    .delete()
+
+                }
+            }
+        db.collection(Collections.SAVED_POST)
+            .whereEqualTo("savedBy",authorId)
+            .get()
+            .addOnCompleteListener {
+                if(it.isSuccessful){
+                    for(doc in it.result.documents){
+                        db.collection(Collections.SAVED_POST)
+                            .document(doc.id)
+                            .delete()
+                    }
+                }
+            }
+
+
+    }
+    private  fun deleteEveryPhotos(authorId: String,maxTry:Int = 0){
+        if(maxTry == 2){
+            return
+        }
+
+        val ref = storage.reference.child("images/${authorId}")
+        ref.listAll().addOnSuccessListener {
+            for(item in it.items){
+                item.delete()
+            }
+        }
+            .addOnFailureListener{
+                    deleteEveryPhotos(authorId,maxTry+1)}
+    }
+
 }
+
 
 
 

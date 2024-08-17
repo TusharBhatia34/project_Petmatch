@@ -61,12 +61,23 @@ fun SavedPostsScreen(
 
         when(getSavedPostsResponse.value){
             is Response.Failure -> {
-                Text(text = "Error")
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.surface),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+
+
+                ) {
+                    Text(text = "Error",color = MaterialTheme.colorScheme.onBackground, style = MaterialTheme.typography.bodyMedium)
+                }
             }
             Response.Loading -> {
                 Column(
                     modifier = Modifier
-                        .fillMaxSize(),
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.surface),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
 

@@ -42,6 +42,9 @@ fun ProfileSettingScreen(
     var showLogOutDialog by rememberSaveable {
         mutableStateOf(false)
     }
+    var showDeleteUserAccountDialog by rememberSaveable {
+        mutableStateOf(false)
+    }
 
 Column(modifier = Modifier
     .fillMaxSize()
@@ -103,7 +106,10 @@ Column(modifier = Modifier
         shape = RoundedCornerShape(8.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)){
+            .padding(vertical = 8.dp)
+            .clickable {
+                showDeleteUserAccountDialog = true
+            }){
         Row (modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)){
@@ -163,6 +169,37 @@ Column(modifier = Modifier
             title = { Text(text ="Confirm Logout", fontWeight = FontWeight.Bold)},
             text = {
                 Text(text = "Are you sure you want to log out?")
+            })
+    }
+    if(showDeleteUserAccountDialog){
+
+        AlertDialog(
+            onDismissRequest = { showDeleteUserAccountDialog =false },
+            confirmButton = {
+                Button(onClick = {
+authViewModel.deleteUserAccount()
+                },     colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )) {
+                    Text("Confirm",fontWeight = FontWeight.Bold,
+                        fontFamily = quickSand
+                    )
+                }
+            },
+            dismissButton = {
+                Button(onClick = { showDeleteUserAccountDialog = false },
+                    colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )) {
+                    Text("Cancel",fontWeight = FontWeight.Bold,
+                        fontFamily = quickSand)
+                }
+            },
+            title = { Text(text ="Confirm Delete", fontWeight = FontWeight.Bold)},
+            text = {
+                Text(text = "Are you sure you want to delete your account?")
             })
     }
 

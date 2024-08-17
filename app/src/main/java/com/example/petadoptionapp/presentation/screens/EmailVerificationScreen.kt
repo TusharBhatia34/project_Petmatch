@@ -94,7 +94,7 @@ Text(
 
         Text(
             buildAnnotatedString {
-                withStyle(style = SpanStyle()) {
+                withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f))) {
                     append("Please click the link to verify your email address, we've sent it to ")
                 }
                 withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.9f))) {
