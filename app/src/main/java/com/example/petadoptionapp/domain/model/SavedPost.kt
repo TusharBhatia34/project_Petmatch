@@ -9,11 +9,13 @@ data class SavedPost(
     val description:String="",
     val gender:String="",
     val healthInformation:String="",
-    val location:String="",
+    val city:String="",
     val name:String ="",
     val photos:List<String> = emptyList(),
     val postTimestamp: Timestamp = Timestamp.now(),
     val savedBy:String ="",
     val timestamp: Timestamp = Timestamp.now(),
-    val type:String=""
+    val type:String="",
+    val country:String="",
+    val state:String=""
 )

@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -25,8 +24,6 @@ class UserDatastore @Inject constructor(private val context: Context) {
     private val LOCATION_KEY = stringPreferencesKey("location")
     private val ABOUT_KEY = stringPreferencesKey("about")
     private val PROFILE_EXISTS_KEY = booleanPreferencesKey("profileExists")
-    private val LATITUDE_KEY = doublePreferencesKey("latitude")
-    private val LONGITUDE_KEY = doublePreferencesKey("longitude")
 
 
 
@@ -35,18 +32,12 @@ class UserDatastore @Inject constructor(private val context: Context) {
     }
 
      fun getProfileInfo() =  context.dataStore.data.map { preferences ->
-             val location = preferences[LOCATION_KEY]
-             val splitLocation = location?.split(",")?: listOf("city","state","country")
 
              UserProfile(
                  name = preferences[NAME_KEY]?:"Unknown",
-                 country = splitLocation[2],
-                 state = splitLocation[1],
+                 country = preferences[LOCATION_KEY]?:"Unknown location",
                  about = preferences[ABOUT_KEY]?:"N/A",
                  profilePicture = preferences[PROFILE_PICTURE]?:"",
-                 city = splitLocation[0],
-                 latitude = preferences[LATITUDE_KEY]?:0.0,
-                 longitude = preferences[LONGITUDE_KEY]?:0.0
              )
 
     }
@@ -58,11 +49,10 @@ class UserDatastore @Inject constructor(private val context: Context) {
         context.dataStore.edit { preferences ->
             preferences[PROFILE_PICTURE] = userProfile.profilePicture
             preferences[NAME_KEY] = userProfile.name
-            preferences[LOCATION_KEY] = "${userProfile.city},${userProfile.state},${userProfile.country}"
+            preferences[LOCATION_KEY] = userProfile.country
             preferences[ABOUT_KEY] = userProfile.about
             preferences[PROFILE_EXISTS_KEY] = true
-            preferences[LATITUDE_KEY] = userProfile.latitude
-            preferences[LONGITUDE_KEY] = userProfile.longitude
+
         }
     }
     suspend fun updateProfileExists() {
@@ -78,11 +68,11 @@ class UserDatastore @Inject constructor(private val context: Context) {
         }
     }
 
-    suspend fun getCurrentProfileLocation() =
+    fun getCurrentProfileLocation() =
         context.dataStore.data.map{pref ->
             pref[LOCATION_KEY]
         }
-    suspend fun getCurrentProfilePicture() =
+     fun getCurrentProfilePicture() =
         context.dataStore.data.map{pref ->
             pref[PROFILE_PICTURE]
         }

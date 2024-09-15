@@ -45,6 +45,7 @@ import com.example.petadoptionapp.data.common.Response
 import com.example.petadoptionapp.data.common.SharedComponents
 import com.example.petadoptionapp.presentation.viewModels.ApplicationViewModel
 import com.example.petadoptionapp.ui.theme.AppTheme
+import com.example.petadoptionapp.ui.theme.quickSand
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,10 +63,7 @@ fun ApplyApplicationScreen(
     var isClicked by remember {
         mutableStateOf(false)
     }
-    val applicantUserName = when (SharedComponents.currentUser!!.displayName){
-        ""-> "unknown User"
-        else -> SharedComponents.currentUser!!.displayName
-    }
+
     val applicationAnswers = remember {
         mutableStateListOf(*List(14) { "" }.toTypedArray())
     }
@@ -75,8 +73,9 @@ fun ApplyApplicationScreen(
                 title = {
                     Text(
                         text = "Application form",
-                        modifier = Modifier.fillMaxWidth(),
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = quickSand,
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
                     ) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
@@ -93,7 +92,7 @@ fun ApplyApplicationScreen(
 
                         if(!hasEmptyAnswersExceptPhoneNumber(applicationAnswers)){
                             isClicked = true
-                            applicationViewModel.sendApplication(applicationAnswers,authorId, applicantId,SharedComponents.timeStamp,currentProfilePicture.value,applicantUserName?:"",petName)
+                            applicationViewModel.sendApplication(applicationAnswers,authorId, applicantId,SharedComponents.timeStamp,currentProfilePicture.value,petName)
                         }
                         else {
                             Toast.makeText(context,"please answer remaining questions.",Toast.LENGTH_SHORT).show()
@@ -107,7 +106,7 @@ fun ApplyApplicationScreen(
                         shape = RoundedCornerShape(8.dp),
                         modifier = Modifier.padding(end = 4.dp)
                     ) {
-                        Text(text = "Apply")
+                        Text(text = "Apply",fontWeight = FontWeight.Bold, fontFamily = quickSand)
                     }
                 }
 
@@ -126,7 +125,7 @@ fun ApplyApplicationScreen(
             )) {
             Text(text = "Personal Information", style = questionHeadlineStyle , fontWeight = questionHeadlineFontWeight)
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text  = "1. What is your full name?",modifier = Modifier.padding(end =8.dp), fontWeight = FontWeight.Medium)
+            Text(text  = "1. What is your full name?",modifier = Modifier.padding(end =8.dp), fontWeight = FontWeight.SemiBold)
             OutlinedTextField(value = applicationAnswers[0], onValueChange = {applicationAnswers[0]=it},modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp),
@@ -136,7 +135,7 @@ fun ApplyApplicationScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
 
-            Text(text  = "2. What is your email address?",modifier = Modifier.padding(end =8.dp), fontWeight = FontWeight.Medium)
+            Text(text  = "2. What is your email address?",modifier = Modifier.padding(end =8.dp), fontWeight = FontWeight.SemiBold)
             OutlinedTextField(value = applicationAnswers[1], onValueChange = {applicationAnswers[1]=it},modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp),
@@ -146,7 +145,7 @@ fun ApplyApplicationScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
 
-            Text(text  = "3. What is your phone number?(Optional)",modifier = Modifier.padding(end = 8.dp), fontWeight = FontWeight.Medium)
+            Text(text  = "3. What is your phone number?(Optional)",modifier = Modifier.padding(end = 8.dp), fontWeight = FontWeight.SemiBold)
             OutlinedTextField(value = applicationAnswers[2], onValueChange = {applicationAnswers[2]=it},modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp),
@@ -158,7 +157,7 @@ fun ApplyApplicationScreen(
             Text(text = "Household Information", style = questionHeadlineStyle , fontWeight = questionHeadlineFontWeight)
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text(text  = "1. Do you live in a house or an apartment?",modifier = Modifier.padding(end =8.dp), fontWeight = FontWeight.Medium)
+            Text(text  = "1. Do you live in a house or an apartment?",modifier = Modifier.padding(end =8.dp), fontWeight = FontWeight.SemiBold)
             OutlinedTextField(value = applicationAnswers[3], onValueChange = {applicationAnswers[3]=it},modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp),
@@ -167,7 +166,7 @@ fun ApplyApplicationScreen(
                     unfocusedBorderColor = MaterialTheme.colorScheme.primary))
             Spacer(modifier = Modifier.height(12.dp))
 
-            Text(text  = "2. Do you own or rent your home?",modifier = Modifier.padding(end =8.dp), fontWeight = FontWeight.Medium)
+            Text(text  = "2. Do you own or rent your home?",modifier = Modifier.padding(end =8.dp), fontWeight = FontWeight.SemiBold)
             OutlinedTextField(value = applicationAnswers[4], onValueChange = {applicationAnswers[4]=it},modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp),
@@ -176,7 +175,7 @@ fun ApplyApplicationScreen(
                     unfocusedBorderColor = MaterialTheme.colorScheme.primary))
             Spacer(modifier = Modifier.height(12.dp))
 
-            Text(text  = "3. How many people live in your household?",modifier = Modifier.padding(end =8.dp), fontWeight = FontWeight.Medium)
+            Text(text  = "3. How many people live in your household?",modifier = Modifier.padding(end =8.dp), fontWeight = FontWeight.SemiBold)
             OutlinedTextField(value = applicationAnswers[5], onValueChange = {applicationAnswers[5]=it},modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp),
@@ -185,7 +184,7 @@ fun ApplyApplicationScreen(
                     unfocusedBorderColor = MaterialTheme.colorScheme.primary))
             Spacer(modifier = Modifier.height(12.dp))
 
-            Text(text  = "4. Are there any children in the household? If yes, what are their ages?",modifier = Modifier.padding(end =8.dp), fontWeight = FontWeight.Medium)
+            Text(text  = "4. Are there any children in the household? If yes, what are their ages?",modifier = Modifier.padding(end =8.dp), fontWeight = FontWeight.SemiBold)
             OutlinedTextField(value = applicationAnswers[6], onValueChange = {applicationAnswers[6]=it},modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp),
@@ -195,7 +194,7 @@ fun ApplyApplicationScreen(
             Spacer(modifier = Modifier.height(24.dp))
             Text(text = "Pet Experience", style = questionHeadlineStyle , fontWeight = questionHeadlineFontWeight)
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text  = "1. Have you had pets before? If yes, please provide details (type of pet, how long you had them, etc).",modifier = Modifier.padding(end =8.dp), fontWeight = FontWeight.Medium)
+            Text(text  = "1. Have you had pets before? If yes, please provide details (type of pet, how long you had them, etc).",modifier = Modifier.padding(end =8.dp), fontWeight = FontWeight.SemiBold)
             OutlinedTextField(value = applicationAnswers[7], onValueChange = {applicationAnswers[7]=it},modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp),
@@ -204,7 +203,7 @@ fun ApplyApplicationScreen(
                     unfocusedBorderColor = MaterialTheme.colorScheme.primary))
             Spacer(modifier = Modifier.height(12.dp))
 
-            Text(text  = "2. Do you currently have any pets? If yes, please provide details (type, age, etc).",modifier = Modifier.padding(end =8.dp), fontWeight = FontWeight.Medium)
+            Text(text  = "2. Do you currently have any pets? If yes, please provide details (type, age, etc).",modifier = Modifier.padding(end =8.dp), fontWeight = FontWeight.SemiBold)
             OutlinedTextField(value = applicationAnswers[8], onValueChange = {applicationAnswers[8]=it},modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp),
@@ -215,7 +214,7 @@ fun ApplyApplicationScreen(
             Spacer(modifier = Modifier.height(24.dp))
             Text(text = "Pet Care", style = questionHeadlineStyle , fontWeight = questionHeadlineFontWeight)
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text  = "1. Who will be primarily responsible for the pet's care?",modifier = Modifier.padding(end =8.dp), fontWeight = FontWeight.Medium)
+            Text(text  = "1. Who will be primarily responsible for the pet's care?",modifier = Modifier.padding(end =8.dp), fontWeight = FontWeight.SemiBold)
             OutlinedTextField(value = applicationAnswers[9], onValueChange = {applicationAnswers[9]=it},modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp),
@@ -226,7 +225,7 @@ fun ApplyApplicationScreen(
             Spacer(modifier = Modifier.height(24.dp))
             Text(text = "Financial", style = questionHeadlineStyle , fontWeight = questionHeadlineFontWeight)
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text  = "1. Are you financially prepared to cover pet expenses, including emergencies?",modifier = Modifier.padding(end =8.dp), fontWeight = FontWeight.Medium)
+            Text(text  = "1. Are you financially prepared to cover pet expenses, including emergencies?",modifier = Modifier.padding(end =8.dp), fontWeight = FontWeight.SemiBold)
             OutlinedTextField(value = applicationAnswers[10], onValueChange = {applicationAnswers[10]=it},modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp),
@@ -237,7 +236,7 @@ fun ApplyApplicationScreen(
             Spacer(modifier = Modifier.height(24.dp))
             Text(text = "Others", style = questionHeadlineStyle , fontWeight = questionHeadlineFontWeight)
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text  = "1. Why are you interested in adopting this pet?",modifier = Modifier.padding(end =8.dp), fontWeight = FontWeight.Medium)
+            Text(text  = "1. Why are you interested in adopting this pet?",modifier = Modifier.padding(end =8.dp), fontWeight = FontWeight.SemiBold)
             OutlinedTextField(value = applicationAnswers[11], onValueChange = {applicationAnswers[11]=it},modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp),
@@ -246,7 +245,7 @@ fun ApplyApplicationScreen(
                     unfocusedBorderColor = MaterialTheme.colorScheme.primary))
             Spacer(modifier = Modifier.height(12.dp))
 
-            Text(text  = "2. Are you willing to provide updates and stay in touch with the pet's previous owner if requested?",modifier = Modifier.padding(end =8.dp), fontWeight = FontWeight.Medium)
+            Text(text  = "2. Are you willing to provide updates and stay in touch with the pet's previous owner if requested?",modifier = Modifier.padding(end =8.dp), fontWeight = FontWeight.SemiBold)
             OutlinedTextField(value = applicationAnswers[12], onValueChange = {applicationAnswers[12]=it},modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp),
@@ -255,7 +254,7 @@ fun ApplyApplicationScreen(
                     unfocusedBorderColor = MaterialTheme.colorScheme.primary))
             Spacer(modifier = Modifier.height(12.dp))
 
-            Text(text  = "3. Is there anything else you would like us to know about you and your application?",modifier = Modifier.padding(end =8.dp), fontWeight = FontWeight.Medium)
+            Text(text  = "3. Is there anything else you would like us to know about you and your application?",modifier = Modifier.padding(end =8.dp), fontWeight = FontWeight.SemiBold)
             OutlinedTextField(value = applicationAnswers[13], onValueChange = {applicationAnswers[13]=it},modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp),

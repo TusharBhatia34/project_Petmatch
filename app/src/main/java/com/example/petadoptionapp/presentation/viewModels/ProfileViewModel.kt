@@ -1,7 +1,6 @@
 package com.example.petadoptionapp.presentation.viewModels
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.petadoptionapp.data.common.Response
@@ -91,7 +90,7 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
- private   fun getUserProfile(){
+ private  fun getUserProfile(){
         viewModelScope.launch {
             userDatastore.getProfileInfo().collect{
                 _userProfile.value = it
@@ -102,24 +101,18 @@ class ProfileViewModel @Inject constructor(
 
     fun saveProfile(
         name: String,
-        location:String,
+        country:String,
         about: String,
         profilePicture: String,
-        locationInLong: Location,
         sameImage:Boolean
 
     ){
-        val splitLocation = location.split(",")
 
         val userProfile = UserProfile(
             name = name,
-            country = splitLocation[2],
-            state = splitLocation[1],
+            country = country,
             about = about,
-            profilePicture = profilePicture,
-            city = splitLocation[0],
-            latitude = locationInLong.lat,
-            longitude = locationInLong.long
+            profilePicture = profilePicture
         )
         viewModelScope.launch {
             _profileSavedResponse.value = saveProfileUseCase.invoke(userProfile,sameImage)

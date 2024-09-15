@@ -91,13 +91,15 @@ fun MapScreen(lat:Double, long:Double, navController: NavController) {
                 )
 
                 if (!addresses.isNullOrEmpty()) {
-                    val location = "${addresses[0].locality},${addresses[0].adminArea},${addresses[0].countryName}"
+                    val location = "${addresses[0].locality}, ${addresses[0].adminArea}, ${addresses[0].countryName}"
 
                     Text(text = location,fontWeight = FontWeight.Normal, style = MaterialTheme.typography.bodyMedium)
                     Spacer(modifier = Modifier.weight(1f))
                     Button(onClick = {
                         navController.previousBackStackEntry?.savedStateHandle?.set("locationInDouble" , Pair(markerState.position.latitude,markerState.position.longitude))
-                        navController.previousBackStackEntry?.savedStateHandle?.set("location",location)
+                        navController.previousBackStackEntry?.savedStateHandle?.set("state",addresses[0].adminArea)
+                        navController.previousBackStackEntry?.savedStateHandle?.set("city",addresses[0].locality)
+                        navController.previousBackStackEntry?.savedStateHandle?.set("country",addresses[0].countryName)
                         navController.popBackStack()
 
                     },

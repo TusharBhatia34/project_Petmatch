@@ -169,7 +169,6 @@ textStyle = TextStyle(fontWeight = FontWeight.SemiBold, fontFamily = quickSand),
             shape = RoundedCornerShape(8.dp)
         ) {
                 Text(text = "Sign in",
-
                     fontWeight = FontWeight.Bold,
                     fontFamily = quickSand)
         }

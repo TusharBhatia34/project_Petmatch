@@ -15,7 +15,9 @@ import com.example.petadoptionapp.domain.model.SavedPost
 import com.example.petadoptionapp.domain.usecases.application.AddAppliedApplicationLocallyUseCase
 import com.example.petadoptionapp.domain.usecases.application.DatabaseIsEmptyUseCase
 import com.example.petadoptionapp.domain.usecases.application.GetAppliedApplicationsUseCase
+import com.example.petadoptionapp.domain.usecases.post.GetFilteredPostsUseCase
 import com.example.petadoptionapp.domain.usecases.post.GetPostUseCase
+import com.example.petadoptionapp.domain.usecases.post.GetSelectedCountryPostsUseCase
 import com.example.petadoptionapp.domain.usecases.post.PostCreationUseCase
 import com.example.petadoptionapp.domain.usecases.savedPost.GetSavedPostUseCase
 import com.example.petadoptionapp.domain.usecases.savedPost.RemoveSavedPostUseCase
@@ -39,8 +41,10 @@ class PostViewModel @Inject constructor(
     private val removeSavedPostUseCase: RemoveSavedPostUseCase,
     private val applicationContext: Context,
     private val addAppliedApplicationLocallyUseCase: AddAppliedApplicationLocallyUseCase,
-   private val databaseIsEmptyUseCase: DatabaseIsEmptyUseCase,
+    private val databaseIsEmptyUseCase: DatabaseIsEmptyUseCase,
     private val getAppliedApplicationsUseCase: GetAppliedApplicationsUseCase,
+    private val getFilteredPostsUseCase: GetFilteredPostsUseCase,
+    private val getSelectedCountryPostsUseCase: GetSelectedCountryPostsUseCase,
     private val userDatastore: UserDatastore
 ):ViewModel() {
 
@@ -70,14 +74,19 @@ class PostViewModel @Inject constructor(
     private var _currentProfileLocation = MutableStateFlow("")
     val currentProfileLocation = _currentProfileLocation.asStateFlow()
 
+    private val _filteredPosts = MutableStateFlow<List<Post>>(emptyList())
+    val filteredPosts = _filteredPosts.asStateFlow()
+
+    private val _filterPostResponse = MutableStateFlow<Response<Boolean>>(Response.Loading)
+    val filterPostResponse = _filterPostResponse.asStateFlow()
     init {
         if(applicationContext.hasLocationPermission()){
 
 if(SharedComponents.currentUser!=null){
     getPost()
     getSavedPost()
-}
 
+}
             getCurrentLocation()
             getProfileLocationLocally()
     }
@@ -85,7 +94,7 @@ if(SharedComponents.currentUser!=null){
 
     init {  //caching mechanism for applied applications
         viewModelScope.launch(Dispatchers.IO) {
-        val currentUser = SharedComponents.currentUser
+            val currentUser = SharedComponents.currentUser
             if(databaseIsEmptyUseCase.invoke() && currentUser!=null){
                 addAppliedApplicationLocallyUseCase.invoke(Entity("dummy"))
                 val result =  getAppliedApplicationsUseCase.invokeToGetAppliedApplicationsRemotely(currentUser.uid)
@@ -104,16 +113,18 @@ if(SharedComponents.currentUser!=null){
                 applicationContext,
                 LocationServices.getFusedLocationProviderClient(applicationContext)
             )
+
             viewModelScope.launch(Dispatchers.IO) {
                 val result = locationClient
                     .getLocationUpdates()
+
                 val location = result.first
+
                 _location.value = Location(lat = location.latitude,long = location.longitude)
+
                 _gettingCurrentLocationResponse.value = result.second
             }
         }
-
-
 
     fun createPost(post: Post){
         viewModelScope.launch {
@@ -123,8 +134,10 @@ if(SharedComponents.currentUser!=null){
 
     fun getPost(){
         viewModelScope.launch(Dispatchers.IO) {
-            getPostUseCase.invoke().collect{
-                _post.value = it
+            userDatastore.getCurrentProfileLocation().collect{ country->
+                getPostUseCase.invoke(country?:"error").collect{
+                    _post.value = it.second
+                }
             }
         }
     }
@@ -148,9 +161,6 @@ if(SharedComponents.currentUser!=null){
         }
     }
 
-    fun insertAppliedApplication(uniqueIdentifier:String){
-        addAppliedApplicationLocallyUseCase.invoke(entity = Entity(uniqueIdentifier))
-    }
 
    private suspend fun getAppliedApplications(){
             getAppliedApplicationsUseCase.invokeToGetAppliedApplicationsLocally().collect{
@@ -161,15 +171,39 @@ if(SharedComponents.currentUser!=null){
     fun resetValue(){
         _createPostResponse.value = Response.Success(false)
         _saveOrUnsavePostResponse.value = Response.Loading
+        _filterPostResponse.value = Response.Loading
     }
 
-   private fun getProfileLocationLocally(){
+   private fun getProfileLocationLocally() {
+       viewModelScope.launch {
+           userDatastore.getCurrentProfileLocation().collect {
+               _currentProfileLocation.value = it ?: ""
+           }
+       }
+   }
+     fun getFilteredPosts(
+        type: String,
+        gender: String,
+        breed: String,
+        city: String,
+        state: String,
+        country: String,
+    ){
         viewModelScope.launch {
-            userDatastore.getCurrentProfileLocation().collect{
-                _currentProfileLocation.value = it?:""
+            getFilteredPostsUseCase.invoke(type, gender, breed, city, state, country).collect{
+                _filterPostResponse.value = it.first
+                _filteredPosts.value = it.second
             }
         }
     }
 
+    fun getCountryPosts(country:String){
+        viewModelScope.launch {
+            getSelectedCountryPostsUseCase.invoke(country).collect{
+                _filterPostResponse.value = it.first
+                _filteredPosts.value = it.second
+            }
+        }
+    }
 
 }

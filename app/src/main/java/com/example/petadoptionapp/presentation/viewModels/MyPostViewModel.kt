@@ -42,15 +42,15 @@ class MyPostViewModel @Inject constructor(
         }
 
     }
- fun editPost(post:Post,newImages:Boolean){
+ fun editPost(post:Post,newImages:Boolean,numOfImagesBefore: Int){
     viewModelScope.launch {
-        _editPostResponse.value = editPostUseCase.invoke(post, newImages)
+        _editPostResponse.value = editPostUseCase.invoke(post, newImages,numOfImagesBefore)
     }
 
 }
-     fun deletePost(authorId:String,timestamp:Timestamp){
+     fun deletePost(authorId:String,timestamp:Timestamp,photosSize:Int){
         viewModelScope.launch {
-            _deletePostResponse.value = deletePostUseCase.invoke(authorId, timestamp)
+            _deletePostResponse.value = deletePostUseCase.invoke(authorId, timestamp,photosSize)
         }
     }
 

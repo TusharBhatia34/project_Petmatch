@@ -44,7 +44,7 @@ class MainActivity : ComponentActivity() {
             
            val window = rememberWindowSizeClass()
             PetAdoptionAppTheme(windowSizeClass = window) {
-              LocationPermissions(multiplePermissionState = permissionsState, activity = this)
+                LocationPermissions(multiplePermissionState = permissionsState, activity = this)
 
                          }
             LaunchedEffect(Unit) {

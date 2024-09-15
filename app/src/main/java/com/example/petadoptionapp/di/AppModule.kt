@@ -20,6 +20,7 @@ import com.example.petadoptionapp.domain.usecases.application.GetApplicationPost
 import com.example.petadoptionapp.domain.usecases.application.GetApplicationsUseCase
 import com.example.petadoptionapp.domain.usecases.application.GetAppliedApplicationsUseCase
 import com.example.petadoptionapp.domain.usecases.application.SendingApplicationUseCase
+import com.example.petadoptionapp.domain.usecases.application.SetApplicationStatusUseCase
 import com.example.petadoptionapp.domain.usecases.auth.DeleteNotVerifiedUserUseCase
 import com.example.petadoptionapp.domain.usecases.auth.DeleteUserAccountUseCase
 import com.example.petadoptionapp.domain.usecases.auth.ReloadUserUseCases
@@ -30,8 +31,10 @@ import com.example.petadoptionapp.domain.usecases.auth.SignOutUseCase
 import com.example.petadoptionapp.domain.usecases.auth.SignUpUseCase
 import com.example.petadoptionapp.domain.usecases.post.DeletePostUseCase
 import com.example.petadoptionapp.domain.usecases.post.EditPostUseCase
+import com.example.petadoptionapp.domain.usecases.post.GetFilteredPostsUseCase
 import com.example.petadoptionapp.domain.usecases.post.GetMyPostsUseCase
 import com.example.petadoptionapp.domain.usecases.post.GetPostUseCase
+import com.example.petadoptionapp.domain.usecases.post.GetSelectedCountryPostsUseCase
 import com.example.petadoptionapp.domain.usecases.post.PostCreationUseCase
 import com.example.petadoptionapp.domain.usecases.profile.ProfileExistsUseCase
 import com.example.petadoptionapp.domain.usecases.profile.SaveProfileUseCase
@@ -76,6 +79,16 @@ object AppModule {
    }
     @Provides
     @Singleton
+   fun provideGetFilteredPostsUseCase(postRepo: PostRepo): GetFilteredPostsUseCase {
+       return GetFilteredPostsUseCase(postRepo)
+   }
+    @Provides
+    @Singleton
+   fun provideGetSelectedCountryPostsUseCase(postRepo: PostRepo): GetSelectedCountryPostsUseCase {
+       return GetSelectedCountryPostsUseCase(postRepo)
+   }
+    @Provides
+    @Singleton
     fun provideAuthRepo(db:Database,userDatastore: UserDatastore): AuthRepo {
         return AuthRepoImp(db,userDatastore)
     }
@@ -104,6 +117,7 @@ object AppModule {
     fun provideDeleteNotVerifiedUserUseCase(authRepo: AuthRepo): DeleteNotVerifiedUserUseCase {
         return DeleteNotVerifiedUserUseCase(authRepo)
     }
+
     @Provides
     @Singleton
     fun provideLoadUserUseCase(authRepo: AuthRepo): ReloadUserUseCases {
@@ -170,6 +184,11 @@ object AppModule {
     @Singleton
     fun provideGetApplicationsUseCase(applicationRepo: ApplicationRepo): GetApplicationsUseCase {
         return  GetApplicationsUseCase(applicationRepo)
+    }
+    @Provides
+    @Singleton
+    fun provideSetApplicationStatusUseCase(applicationRepo: ApplicationRepo): SetApplicationStatusUseCase {
+        return SetApplicationStatusUseCase(applicationRepo)
     }
     @Provides
     @Singleton

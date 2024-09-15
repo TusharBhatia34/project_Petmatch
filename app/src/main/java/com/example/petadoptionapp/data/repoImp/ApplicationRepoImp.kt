@@ -1,6 +1,5 @@
 package com.example.petadoptionapp.data.repoImp
 
-import android.util.Log
 import com.example.petadoptionapp.data.common.Collections
 import com.example.petadoptionapp.data.common.Response
 import com.example.petadoptionapp.data.common.SharedComponents
@@ -27,22 +26,20 @@ class ApplicationRepoImp:ApplicationRepo {
         timestamp: Timestamp
     ): Response<Boolean> {
 
-
         try {
             db.collection(Collections.APPLICATIONS)
                 .document("${applicantId}_${authorId}_${timestamp.toDate()}_${timestamp.toDate().time}")
                 .set(Applications(
                    applicantId =  applicantId,
                     applicationAnswers =  answers,
-                   authorId =  authorId,
+                    authorId =  authorId,
                     postTimeStamp = postTimeStamp,
                     timestamp = timestamp,
                     hasRead = false,
                     applicantUserName = applicantUserName ,
                     petName = petName,
-                    applicantProfilePicture = applicantProfilePicture
-
-
+                    applicantProfilePicture = applicantProfilePicture,
+                    documentId = "${applicantId}_${authorId}_${timestamp.toDate()}_${timestamp.toDate().time}"
                 )).await()
             return Response.Success(true)
         }
@@ -51,6 +48,7 @@ class ApplicationRepoImp:ApplicationRepo {
         }
 
     }
+
 
     override suspend fun getApplications(): Pair<List<Applications>,Response<Boolean>> {
         try{
@@ -96,6 +94,23 @@ return Pair(null,Response.Failure(e))
             .set(hashMapOf("hasRead" to true), SetOptions.merge())
     }
 
+    override suspend fun setApplicationStatus(
+       documentId: String,
+        status: String
+    ): Response<Boolean> {
+        try {
+ db.collection(Collections.APPLICATIONS)
+  .document(documentId)
+     .set(hashMapOf("applicationStatus" to status), SetOptions.merge())
+     .await()
+           return if(status=="Accepted") Response.Success(true) else Response.Success(false)
+
+
+        }
+        catch (e:Exception){
+            return Response.Failure(e)
+        }
+    }
     override suspend fun getAppliedApplications(applicantId: String): Pair<List<Applications>, Response<Boolean>> {
         try{
             val allApplications = mutableListOf<Applications>()
@@ -108,7 +123,6 @@ return Pair(null,Response.Failure(e))
                     val application = document.toObject<Applications>()
                     allApplications.add(application)
                 }
-
             }
             return Pair(allApplications.ifEmpty { emptyList() },Response.Success(true))
         }

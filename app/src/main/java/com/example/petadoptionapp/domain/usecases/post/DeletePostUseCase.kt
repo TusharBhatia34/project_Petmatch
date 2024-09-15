@@ -7,5 +7,5 @@ import javax.inject.Inject
 class DeletePostUseCase @Inject constructor(
     private val postRepo: PostRepo
 ){
-    suspend fun invoke(authorId:String,timestamp: Timestamp) = postRepo.deletePost(authorId,timestamp)
+    suspend fun invoke(authorId:String,timestamp: Timestamp,photosSize:Int) = postRepo.deletePost(authorId,timestamp,photosSize)
 }

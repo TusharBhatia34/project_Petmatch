@@ -9,8 +9,8 @@ import kotlinx.coroutines.flow.Flow
 interface PostRepo {
    suspend fun createPost (post: Post): Response<Boolean>
 
-   suspend fun deletePost(authorId: String,timeStamp: Timestamp):Response<Boolean>
-   suspend fun getPost(): Flow<List<Post>>
+   suspend fun deletePost(authorId: String,timeStamp: Timestamp,photosSize:Int):Response<Boolean>
+   suspend fun getPost(country:String): Flow<Pair<Response<Boolean>,List<Post>>>
 
    suspend fun savePost(savedPost: SavedPost):Response<Boolean>
 
@@ -20,6 +20,11 @@ interface PostRepo {
 
    suspend fun getMyPosts():Pair<Response<Boolean>,List<Post>>
 
-   suspend fun editPost(post: Post,newImages:Boolean):Response<Boolean>
+   suspend fun editPost(post: Post,newImages:Boolean,numOfImagesBefore:Int):Response<Boolean>
+
+   suspend fun getFilteredPosts(type: String, gender: String, breed: String, city: String, state: String, country: String):Flow<Pair<Response<Boolean>,List<Post>>>
+
+   suspend fun getSelectedCountryPosts(country:String): Flow<Pair<Response<Boolean>,List<Post>>>
+
 
 }

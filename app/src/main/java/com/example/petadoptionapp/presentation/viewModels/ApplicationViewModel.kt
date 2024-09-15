@@ -12,6 +12,7 @@ import com.example.petadoptionapp.domain.usecases.application.EditNotificationUs
 import com.example.petadoptionapp.domain.usecases.application.GetApplicationPostUseCase
 import com.example.petadoptionapp.domain.usecases.application.GetApplicationsUseCase
 import com.example.petadoptionapp.domain.usecases.application.SendingApplicationUseCase
+import com.example.petadoptionapp.domain.usecases.application.SetApplicationStatusUseCase
 import com.google.firebase.Timestamp
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -27,7 +28,8 @@ class ApplicationViewModel @Inject constructor(
     private val getApplicationPostUseCase: GetApplicationPostUseCase,
     private val editNotificationUseCase: EditNotificationUseCase,
     private val addAppliedApplicationLocallyUseCase: AddAppliedApplicationLocallyUseCase,
-    private val userDatastore: UserDatastore
+    private val userDatastore: UserDatastore,
+    private val setApplicationStatusUseCase: SetApplicationStatusUseCase
     ): ViewModel()  {
 
     private val _sendingApplicationResponse = MutableStateFlow<Response<Boolean>>(Response.Loading)
@@ -40,36 +42,47 @@ class ApplicationViewModel @Inject constructor(
     private val _getApplicationPostResponse = MutableStateFlow<Response<Boolean>>(Response.Loading)
     val getApplicationPostResponse = _getApplicationPostResponse.asStateFlow()
 
+
     private val _getApplicationPost = MutableStateFlow<Post?>(null)
     val getApplicationPost = _getApplicationPost.asStateFlow()
 
     private var _currentProfilePicture = MutableStateFlow("")
     val currentProfilePicture = _currentProfilePicture.asStateFlow()
 
+
+    private val _getApplicationStatusResponse = MutableStateFlow<Response<Boolean>>(Response.Loading)
+    val getApplicationStatusResponse = _getApplicationStatusResponse.asStateFlow()
+
     init {
         getApplications()
         getProfilePictureLocally()
     }
+
     fun sendApplication(
         answers: List<String>,
         authorId: String,
         applicantId: String,
         postTimeStamp: Timestamp,
         applicantProfilePicture: String,
-        applicantUserName:String,
         petName:String
     ){
+
         viewModelScope.launch {
 
-           _sendingApplicationResponse.value = sendingApplicationUseCase.invoke(
-               answers,
-               authorId,
-               applicantId,
-               postTimeStamp,
-               applicantProfilePicture,
-               applicantUserName,
-               petName
-           )
+            userDatastore.getProfileInfo().collect{
+                val applicantUserName =  it.name
+                _sendingApplicationResponse.value = sendingApplicationUseCase.invoke(
+                    answers,
+                    authorId,
+                    applicantId,
+                    postTimeStamp,
+                    applicantProfilePicture,
+                    applicantUserName,
+                    petName
+                )
+            }
+
+
         }
     }
 
@@ -90,6 +103,15 @@ class ApplicationViewModel @Inject constructor(
         }
     }
 
+    fun toSetApplicationStatus(documentId:String, applicationStatus:String,index:Int){
+        viewModelScope.launch {
+        _getApplicationStatusResponse.value= setApplicationStatusUseCase.invoke(documentId,applicationStatus)
+            _applicationsList.value = _applicationsList.value.toMutableList().also { list ->
+                list[index] = list[index].copy(applicationStatus = applicationStatus)
+            }
+        }
+
+    }
     fun resetValue(){
         _sendingApplicationResponse.value = Response.Loading
 
@@ -115,4 +137,6 @@ class ApplicationViewModel @Inject constructor(
             }
         }
     }
+
+
 }

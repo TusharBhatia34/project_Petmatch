@@ -28,7 +28,6 @@ fun CompleteProfileScreen(
         )
     }
     else {
-        val currLocation = profileViewModel.location.collectAsStateWithLifecycle()
         val response = profileViewModel.profileSavedResponse.collectAsStateWithLifecycle()
        ProfileScreen(
            name = "",
@@ -36,10 +35,9 @@ fun CompleteProfileScreen(
            profilePicture = "",
            location = "",
            screenTitle = "Complete your profile",
-           currentLocation = currLocation.value,
            buttonText = "Save",
-           buttonAction = { name,location,about,profilePicture ,locationInDouble,sameImage->
-                          profileViewModel.saveProfile(name, location, about, profilePicture,locationInDouble,sameImage)
+           buttonAction = { name,location,about,profilePicture ,sameImage->
+                          profileViewModel.saveProfile(name, location, about, profilePicture,sameImage)
            },
            responseAction = {
                navController.navigate(Routes.HomeScreen)

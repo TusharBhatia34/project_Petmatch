@@ -12,4 +12,6 @@ data class Applications(
     val petName:String="",
     val postTimeStamp:Timestamp=Timestamp.now(),
     val timestamp: Timestamp= Timestamp.now(),
+    val applicationStatus:String="",
+    val documentId:String="",
     )

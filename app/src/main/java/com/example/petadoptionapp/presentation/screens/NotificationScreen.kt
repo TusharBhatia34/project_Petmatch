@@ -108,19 +108,21 @@ fun NotificationScreen(
                                     .fillMaxWidth()
 
                                     .clickable {
-                                        SharedComponents.timeStamp =
-                                            applicationsList.value[index].postTimeStamp
+                                        SharedComponents.timeStamp = applicationsList.value[index].postTimeStamp
                                         applicationViewModel.toUpdateHasRead(
                                             applicationsList.value[index].applicantId,
                                             applicationsList.value[index].authorId,
                                             applicationsList.value[index].timestamp,
                                             index
                                         )
+
                                         navController.navigate(
                                             Routes.ApplicationFormRoute(
-                                                true,
                                                 applicationsList.value[index].applicationAnswers,
-                                                applicationsList.value[index].authorId
+                                                applicationsList.value[index].authorId,
+                                                applicationsList.value[index].applicationStatus,
+                                                applicationsList.value[index].documentId,
+                                                index
                                             )
                                         )
                                     },

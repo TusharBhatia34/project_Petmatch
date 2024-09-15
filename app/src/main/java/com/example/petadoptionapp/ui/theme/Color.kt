@@ -97,10 +97,11 @@ val surfaceContainerLowDark = Color(0xFF22191A)
 val surfaceContainerHighDark = Color(0xFF312829)
 
 
-
+val acceptApplication = Color(0xFF4AB277)
+val rejectApplication = Color(0xFFEB3343)
 val on = Color(0xFFFFC2C8)
 val male = Color(0xFF3C85F8)
-
+val stillInReviewButtonColor = Color(0xFFFFC33E)
 //val primaryLight = Color(0xFF8E4955)
 // val onPrimaryLight = Color(0xFFFFFFFF)
 //val primaryContainerLight = Color(0xFFFFD9DD)

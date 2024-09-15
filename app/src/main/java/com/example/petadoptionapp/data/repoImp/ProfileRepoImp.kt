@@ -63,6 +63,7 @@ class ProfileRepoImp @Inject constructor(
                .get()
                .await()
            if(result.exists()){
+
               val userProfile = result.toObject<UserProfile>()
                userDatastore.saveProfileInfo(userProfile!!)
                return Response.Success(true)

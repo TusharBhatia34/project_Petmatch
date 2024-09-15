@@ -5,7 +5,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.petadoptionapp.data.common.Routes
-import com.example.petadoptionapp.domain.model.Location
 import com.example.petadoptionapp.presentation.viewModels.ProfileViewModel
 
 @Composable
@@ -20,12 +19,11 @@ fun EditProfileScreen(
             name = profile.name,
             about = profile.about ,
             profilePicture = profile.profilePicture ,
-            location = "${profile.city},${profile.state},${profile.country}",
+            location = profile.country,
             screenTitle = "Edit Profile" ,
-            currentLocation = Location(profile.latitude,profile.longitude) ,
             buttonText = "Save",
-            buttonAction = { name,location,about,profilePicture ,locationInDouble,sameImage->
-                profileViewModel.saveProfile(name, location, about, profilePicture,locationInDouble,sameImage)
+            buttonAction = { name,location,about,profilePicture ,sameImage->
+                profileViewModel.saveProfile(name, location, about, profilePicture,sameImage)
             },
             responseAction = {
                 navController.navigate(Routes.ViewProfileScreen){

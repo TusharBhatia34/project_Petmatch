@@ -68,6 +68,7 @@ import com.example.petadoptionapp.presentation.components.ImageSlider
 import com.example.petadoptionapp.presentation.viewModels.PostViewModel
 import com.example.petadoptionapp.ui.theme.AppTheme
 import com.example.petadoptionapp.ui.theme.male
+import com.example.petadoptionapp.ui.theme.quickSand
 import com.google.firebase.Timestamp
 
 
@@ -114,9 +115,9 @@ Box(modifier = Modifier.fillMaxSize()){
                 else{
                     postViewModel.savePost(
                         SavedPost(
-                            age = post.age,
+                            age = post.bornOn,
                             gender = post.gender,
-                            location = post.location,
+                            city = post.city,
                             name = post.name,
                             photos = post.photos,
                             description = post.description,
@@ -126,7 +127,9 @@ Box(modifier = Modifier.fillMaxSize()){
                             timestamp = Timestamp.now(),
                             type = post.type,
                             savedBy = currentUser,
-                            postTimestamp = timestamp
+                            postTimestamp = timestamp,
+                            state = post.state,
+                            country = post.country
                         )
                     )
                 }
@@ -152,9 +155,9 @@ Box(modifier = Modifier.fillMaxSize()){
 
                             postViewModel.savePost(
                                 SavedPost(
-                                    age = post.age,
+                                    age = post.bornOn,
                                     gender = post.gender,
-                                    location = post.location,
+                                    city = post.city,
                                     name = post.name,
                                     photos = post.photos,
                                     description = post.description,
@@ -164,7 +167,9 @@ Box(modifier = Modifier.fillMaxSize()){
                                     timestamp = Timestamp.now(),
                                     type = post.type,
                                     savedBy = currentUser,
-                                    postTimestamp = timestamp
+                                    postTimestamp = timestamp,
+                                    state = post.state,
+                                    country = post.country
                                 )
                             )
                         }
@@ -227,7 +232,7 @@ Box(modifier = Modifier.fillMaxSize()){
                         .alpha(0.5f)
                         .size(locationTextHeightDp)
                 )
-                Text(text = post.location,modifier = Modifier
+                Text(text = "${post.city}, ${post.state}, ${post.country}",modifier = Modifier
                     .alpha(0.5f)
                     .onGloballyPositioned {
                         locationTextHeightDp = with(localDensity) { it.size.height.toDp() }
@@ -236,7 +241,7 @@ Box(modifier = Modifier.fillMaxSize()){
             Spacer(modifier = Modifier.height(AppTheme.dimens.mediumLarge))
             Row {
                 Text(text = "Born on:",modifier = Modifier.width(70.dp), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
-                Text(text = post.age,modifier =Modifier.alpha(0.6f), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+                Text(text = post.bornOn,modifier =Modifier.alpha(0.6f), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
             }
             Spacer(modifier = Modifier.height(AppTheme.dimens.small))
 
@@ -275,7 +280,7 @@ Box(modifier = Modifier.fillMaxSize()){
                     shape = RoundedCornerShape(8.dp)
                 ) {
 
-                        Text(text = "Applied")
+                        Text(text = "Applied", fontWeight = FontWeight.Bold, fontFamily = quickSand)
                         Icon(imageVector = Icons.Default.Done, contentDescription = null)
 
                 }
@@ -298,7 +303,7 @@ Box(modifier = Modifier.fillMaxSize()){
                     ),
                     shape = RoundedCornerShape(8.dp)
                 ) {
-                    Text(text = "Adopt")
+                    Text(text = "Adopt", fontWeight = FontWeight.Bold, fontFamily = quickSand)
                 }
         }
             LaunchedEffect(saveOrUnSaveResponse.value) {

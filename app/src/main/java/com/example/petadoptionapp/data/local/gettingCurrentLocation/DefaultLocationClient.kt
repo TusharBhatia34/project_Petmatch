@@ -27,14 +27,12 @@ class DefaultLocationClient(
     @SuppressLint("MissingPermission")
      suspend fun getLocationUpdates(): Pair<Location, Response<Boolean>>{
 try {
-    if(!context.hasLocationPermission()) {
-        return Pair(emptyLocation(), Response.Failure(Exception("locationPermission")))
-    }
 
     val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
     val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
     val isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
     if(!isGpsEnabled && !isNetworkEnabled) {
+println("error")
         return Pair(emptyLocation(), Response.Failure(Exception("gps")))
     }
 
@@ -47,11 +45,14 @@ try {
         override fun onLocationResult(result: LocationResult) {
 
             super.onLocationResult(result)
+
             result.locations.lastOrNull()?.let {location ->
+
                 locationDeferred.complete(location)
             }
         }
     }
+
 
     client.requestLocationUpdates(
         request,
@@ -60,10 +61,12 @@ try {
     ).await()
 
     val currentLocation: Location = locationDeferred.await()
+
     return Pair(currentLocation, Response.Success(true))
 
 }
 catch (e:Exception){
+
     return Pair(emptyLocation(), Response.Failure(Exception("There is some issue.")))
 }
 

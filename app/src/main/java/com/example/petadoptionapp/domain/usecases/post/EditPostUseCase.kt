@@ -8,5 +8,5 @@ class EditPostUseCase @Inject constructor(
     private val postRepo: PostRepo
 ) {
 
-    suspend fun invoke(post: Post,newImages:Boolean) = postRepo.editPost(post,newImages)
+    suspend fun invoke(post: Post,newImages:Boolean, numOfImagesBefore: Int) = postRepo.editPost(post,newImages,numOfImagesBefore)
 }

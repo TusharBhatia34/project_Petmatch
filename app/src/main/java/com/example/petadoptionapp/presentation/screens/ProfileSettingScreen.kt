@@ -90,10 +90,12 @@ Column(modifier = Modifier
         shape = RoundedCornerShape(8.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)){
+            .padding(vertical = 8.dp)
+            .clickable { navController.navigate(Routes.MyApplicationsScreen) }){
         Row (modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)){
+            .padding(8.dp)
+           ){
             Text(text = "My Applications",modifier = Modifier.weight(1f), fontWeight = FontWeight.Medium)
             Icon(imageVector = Icons.Default.ArrowForwardIos, contentDescription = null,tint = Color.Gray)
         }

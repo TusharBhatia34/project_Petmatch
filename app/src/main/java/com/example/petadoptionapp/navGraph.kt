@@ -15,11 +15,14 @@ import com.example.petadoptionapp.domain.model.Post
 import com.example.petadoptionapp.presentation.screens.ApplicationFormScreen
 import com.example.petadoptionapp.presentation.screens.ApplyApplicationScreen
 import com.example.petadoptionapp.presentation.screens.CompleteProfileScreen
+import com.example.petadoptionapp.presentation.screens.CountriesListScreen
 import com.example.petadoptionapp.presentation.screens.EditProfileScreen
 import com.example.petadoptionapp.presentation.screens.EmailVerificationScreen
+import com.example.petadoptionapp.presentation.screens.FilteredResultScreen
 import com.example.petadoptionapp.presentation.screens.ForgotPasswordScreen
 import com.example.petadoptionapp.presentation.screens.HomeScreen
 import com.example.petadoptionapp.presentation.screens.MapScreen
+import com.example.petadoptionapp.presentation.screens.MyApplicationsScreenScreen
 import com.example.petadoptionapp.presentation.screens.MyPostDetailScreen
 import com.example.petadoptionapp.presentation.screens.MyPostsScreen
 import com.example.petadoptionapp.presentation.screens.NotificationScreen
@@ -50,8 +53,8 @@ else if(!profileExists.value) {
     else {Routes.HomeScreen}
         ){
 
-composable<Routes.CompleteProfileScreen> {
-CompleteProfileScreen(activity = activity, navController = navController)
+        composable<Routes.CompleteProfileScreen> {
+        CompleteProfileScreen(activity = activity, navController = navController)
 }
     composable<Routes.SignInScreen>{
         SignInScreen(navController = navController,postViewModel =postViewModel)
@@ -67,8 +70,10 @@ CompleteProfileScreen(activity = activity, navController = navController)
     composable<Routes.EditProfileScreen>{
         EditProfileScreen(navController = navController, profileViewModel = profileViewModel)
     }
-
-
+    composable<Routes.FilterPostsRoute>{
+        val screenTitle = it.toRoute<Routes.FilterPostsRoute>().screenTitle
+        FilteredResultScreen(screenTitle,navController = navController, postViewModel = postViewModel)
+    }
     composable<Routes.HomeScreen>{
         HomeScreen(navController= navController, postViewModel = postViewModel, modifier = modifier)
     }
@@ -88,21 +93,26 @@ SavedPostsScreen(navController = navController, postViewModel = postViewModel,mo
     composable<Routes.NotificationScreen>{
 NotificationScreen(navController = navController)
     }
+    composable<Routes.MyApplicationsScreen>{
+MyApplicationsScreenScreen(navController = navController)
+    }
     composable<Routes.ProfileSettingScreen>{
 ProfileSettingScreen(navController)
     }
     composable<Routes.PostDetailsScreen> {
 val post = Post(
-    age = it.toRoute<Routes.PostDetailsScreen>().age,
+    bornOn = it.toRoute<Routes.PostDetailsScreen>().age,
     breed = it.toRoute<Routes.PostDetailsScreen>().breed,
     description = it.toRoute<Routes.PostDetailsScreen>().description,
     gender = it.toRoute<Routes.PostDetailsScreen>().gender,
     healthInformation = it.toRoute<Routes.PostDetailsScreen>().healthInformation,
     name = it.toRoute<Routes.PostDetailsScreen>().name,
     photos = it.toRoute<Routes.PostDetailsScreen>().photos,
-    location = it.toRoute<Routes.PostDetailsScreen>().location,
+    state = it.toRoute<Routes.PostDetailsScreen>().state,
     authorId = it.toRoute<Routes.PostDetailsScreen>().authorId,
     type = it.toRoute<Routes.PostDetailsScreen>().type,
+    country = it.toRoute<Routes.PostDetailsScreen>().country,
+    city = it.toRoute<Routes.PostDetailsScreen>().city
     )
 
 PostDetailsScreen(post = if(post.name=="") null else post,navController,postViewModel)
@@ -114,23 +124,48 @@ PostDetailsScreen(post = if(post.name=="") null else post,navController,postView
 
     composable<Routes.MyPostDetailsScreen> {
 val post = Post(
-    age = it.toRoute<Routes.MyPostDetailsScreen>().age,
+    bornOn = it.toRoute<Routes.MyPostDetailsScreen>().age,
     breed = it.toRoute<Routes.MyPostDetailsScreen>().breed,
     description = it.toRoute<Routes.MyPostDetailsScreen>().description,
     gender = it.toRoute<Routes.MyPostDetailsScreen>().gender,
     healthInformation = it.toRoute<Routes.MyPostDetailsScreen>().healthInformation,
     name = it.toRoute<Routes.MyPostDetailsScreen>().name,
     photos = it.toRoute<Routes.MyPostDetailsScreen>().photos,
-    location = it.toRoute<Routes.MyPostDetailsScreen>().location,
+    state = it.toRoute<Routes.MyPostDetailsScreen>().state,
     authorId = it.toRoute<Routes.MyPostDetailsScreen>().authorId,
     type = it.toRoute<Routes.MyPostDetailsScreen>().type,
+    country = it.toRoute<Routes.MyPostDetailsScreen>().country,
+    city = it.toRoute<Routes.MyPostDetailsScreen>().city
     )
 
         MyPostDetailScreen(post, navController)
     }
 
+composable<Routes.CountryListScreen>{
+    val isProfileScreen = it.toRoute<Routes.CountryListScreen>().isProfileScreen
+CountriesListScreen(backButtonAction = { navController.popBackStack() },
+   onClickAction = { country->
+       if (isProfileScreen){
+navController.previousBackStackEntry?.savedStateHandle?.set("country",country)
+           navController.popBackStack()
+       }
+       else{
+           postViewModel.getCountryPosts(country)
+           navController.navigate(Routes.FilterPostsRoute(country))
+       }
+   } )
+}
 
+    composable<Routes.ApplicationFormRoute>{
+        val authorId = it.toRoute<Routes.ApplicationFormRoute>().authorId
+        val answersList= it.toRoute<Routes.ApplicationFormRoute>().answersList
+        val applicationStatus= it.toRoute<Routes.ApplicationFormRoute>().applicationStatus
+        val documentId = it.toRoute<Routes.ApplicationFormRoute>().documentId
+        val myApplicationsViewScreen = it.toRoute<Routes.ApplicationFormRoute>().myApplicationViewScreen
+        val index = it.toRoute<Routes.ApplicationFormRoute>().index
 
+        ApplicationFormScreen(answersList,navController,authorId, applicationStatus,documentId,myApplicationsViewScreen,index = index)
+    }
 
 
     composable<Routes.MapScreenRoute>{
@@ -144,26 +179,25 @@ val post = Post(
 
         ApplyApplicationScreen(authorId = authorId ,navController = navController, petName = petName)
     }
-    composable<Routes.ApplicationFormRoute>{
-        val authorId = it.toRoute<Routes.ApplicationFormRoute>().authorId
-        val answersList= it.toRoute<Routes.ApplicationFormRoute>().answersList
-        val applicationAnswersScreen= it.toRoute<Routes.ApplicationFormRoute>().applicationAnswersScreen
 
-        ApplicationFormScreen(applicationAnswersScreen = applicationAnswersScreen, answersList =answersList , navController =navController,authorId= authorId )
-    }
+
 
     composable<Routes.EditPostScreenRoute>{
         val post = Post(
-            age = it.toRoute<Routes.EditPostScreenRoute>().age,
+            bornOn = it.toRoute<Routes.EditPostScreenRoute>().age,
             breed = it.toRoute<Routes.EditPostScreenRoute>().breed,
             description = it.toRoute<Routes.EditPostScreenRoute>().description,
             gender = it.toRoute<Routes.EditPostScreenRoute>().gender,
             healthInformation = it.toRoute<Routes.EditPostScreenRoute>().healthInformation,
             name = it.toRoute<Routes.EditPostScreenRoute>().name,
             photos = it.toRoute<Routes.EditPostScreenRoute>().photos,
-            location = it.toRoute<Routes.EditPostScreenRoute>().location,
+            state = it.toRoute<Routes.EditPostScreenRoute>().state,
             authorId = it.toRoute<Routes.EditPostScreenRoute>().authorId,
             type = it.toRoute<Routes.EditPostScreenRoute>().type,
+            country = it.toRoute<Routes.EditPostScreenRoute>().country,
+            city = it.toRoute<Routes.EditPostScreenRoute>().city
+
+
         )
         PostScreen(
         navController = navController,

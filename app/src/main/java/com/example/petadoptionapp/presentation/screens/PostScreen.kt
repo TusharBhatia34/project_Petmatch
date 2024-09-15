@@ -98,9 +98,11 @@ fun PostScreen(
     val animalTypes by rememberSaveable { mutableStateOf(listOf("Dog","Cat","Bird")) }
     val genders by rememberSaveable { mutableStateOf(listOf("Male","Female"))}
     var breedField by rememberSaveable { mutableStateOf(post.breed) }
-    var locationField by rememberSaveable { mutableStateOf(post.location) }
+    var cityField by rememberSaveable { mutableStateOf(post.city) }
+    var stateField by rememberSaveable { mutableStateOf(post.state) }
+    var countryField by rememberSaveable { mutableStateOf(post.country) }
     var descriptionField by rememberSaveable { mutableStateOf(post.description) }
-    var birthDateField by rememberSaveable { mutableStateOf(post.age) }
+    var birthDateField by rememberSaveable { mutableStateOf(post.bornOn) }
     var selectedAnimal by rememberSaveable { mutableStateOf(post.type) }
     var selectedGender by rememberSaveable { mutableStateOf(post.gender) }
     var selectedImages by rememberSaveable { mutableStateOf(post.photos)}
@@ -111,8 +113,8 @@ fun PostScreen(
         mutableStateOf(false)
     }
     val interactionSource = remember{ MutableInteractionSource() }
-    val editedValues = selectedAnimal !=post.type || selectedGender!=post.gender || nameField!=post.name || breedField != post.breed || birthDateField!=post.age ||
-            locationField!=post.location || descriptionField != post.description || healthInformationField != post.healthInformation || selectedImages!=post.photos
+    val editedValues = selectedAnimal !=post.type || selectedGender!=post.gender || nameField!=post.name || breedField != post.breed || birthDateField!=post.bornOn ||
+            cityField!=post.city||stateField!=post.state|| countryField!=post.country|| descriptionField != post.description || healthInformationField != post.healthInformation || selectedImages!=post.photos
 
 val multiImagesPicker = rememberLauncherForActivityResult(
     contract = ActivityResultContracts.PickMultipleVisualMedia(3),
@@ -134,43 +136,48 @@ val multiImagesPicker = rememberLauncherForActivityResult(
                             onClick = {
 
                                 if (selectedGender==""||selectedAnimal=="" || selectedImages.isEmpty()
-                                    ||breedField==""||locationField==""||descriptionField==""||birthDateField==""||healthInformationField==""||nameField ==""){
+                                    ||breedField==""||countryField==""||descriptionField==""||birthDateField==""||healthInformationField==""||nameField ==""){
                                     Toast.makeText(context,"Fill all details.",Toast.LENGTH_SHORT).show()
                                 }
                                 else if(editScreen){
                                     isClicked = true
                                    myPostViewModel.editPost(
                                        Post(
-                                           age = birthDateField,
+                                           bornOn = birthDateField,
                                            authorId = SharedComponents.currentUser!!.uid,
                                            breed = breedField,
                                            description = descriptionField,
                                            gender = selectedGender,
-                                           location = locationField,
+                                           city = cityField,
                                            photos = selectedImages,
                                            timestamp = SharedComponents.timeStamp,
                                            type = selectedAnimal,
                                            healthInformation = healthInformationField,
-                                           name = nameField
+                                           name = nameField,
+                                           state = stateField,
+                                           country = countryField
                                            ),
-                                           newImages = post.photos != selectedImages
+                                           newImages = post.photos != selectedImages,
+                                            numOfImagesBefore = post.photos.size
                                    )
                                 }
                                 else {
                                     isClicked = true
                                     postScreenViewModel.createPost(
                                         Post(
-                                            age = birthDateField,
+                                            bornOn = birthDateField,
                                             authorId = SharedComponents.currentUser!!.uid,
                                             breed = breedField,
                                             description = descriptionField,
                                             gender = selectedGender,
-                                            location = locationField,
                                             photos = selectedImages,
                                             timestamp = Timestamp.now(),
                                             type = selectedAnimal,
                                             healthInformation = healthInformationField,
-                                            name = nameField
+                                            name = nameField,
+                                            city = cityField,
+                                            state = stateField,
+                                            country = countryField
                                         )
                                     )
 
@@ -309,7 +316,7 @@ val multiImagesPicker = rememberLauncherForActivityResult(
                 )
             Spacer(modifier = Modifier.height(AppTheme.dimens.mediumLarge))
             OutlinedTextField(
-                value = locationField,
+                value =  if(countryField!="")"${cityField}, ${stateField}, $countryField" else "",
                 onValueChange = {},
                 modifier = Modifier
 
@@ -480,10 +487,20 @@ val multiImagesPicker = rememberLauncherForActivityResult(
 
 
             }
-            val result = navController.currentBackStackEntry?.savedStateHandle?.get<String>("location")
-            result?.let {
-                locationField = it
-                navController.currentBackStackEntry?.savedStateHandle?.remove<String>("location")
+            val cityResult = navController.currentBackStackEntry?.savedStateHandle?.get<String>("city")
+            val stateResult = navController.currentBackStackEntry?.savedStateHandle?.get<String>("state")
+            val countryResult = navController.currentBackStackEntry?.savedStateHandle?.get<String>("country")
+            cityResult?.let {
+                cityField = it
+                navController.currentBackStackEntry?.savedStateHandle?.remove<String>("city")
+            }
+            stateResult?.let {
+                stateField = it
+                navController.currentBackStackEntry?.savedStateHandle?.remove<String>("state")
+            }
+            countryResult?.let {
+                countryField = it
+                navController.currentBackStackEntry?.savedStateHandle?.remove<String>("country")
             }
         }
     }

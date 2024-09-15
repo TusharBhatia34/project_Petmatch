@@ -25,8 +25,8 @@ class PostRepoImp: PostRepo {
 
         try{
             val imageUrls = mutableListOf<String>()
-            for(uri in post.photos){
-               val result =  uploadFile(post.authorId,post.timestamp.toString(),uri)
+            for((index, uri) in post.photos.withIndex()){
+               val result =  uploadFile(post.authorId,post.timestamp.toString(),uri,index)
                 if(result.first){
 
                     imageUrls.add(result.second)
@@ -43,22 +43,26 @@ class PostRepoImp: PostRepo {
             return Response.Success(true)
         }
         catch(e:Exception){
-          deleteFile(post.authorId,post.timestamp.toString())
             return Response.Failure(e)
         }
 
     }
 
 
-    override suspend fun editPost(post:Post,newImages:Boolean): Response<Boolean> {
+    override suspend fun editPost(post:Post,newImages:Boolean,numOfImagesBefore:Int): Response<Boolean> {
 
         try {
             var imageUrls = post.photos.toMutableList()
             if(newImages){
+                if(post.photos.size<numOfImagesBefore){
+                    for (index in numOfImagesBefore -1 downTo post.photos.size){
+                        deleteFile(post.authorId,post.timestamp.toString(),index)
+                    }
+                }
                 imageUrls = emptyList<String>().toMutableList()
-                for(uri in post.photos){
+                for((index,uri) in post.photos.withIndex()){
 
-                    val result =  uploadFile(post.authorId,post.timestamp.toString(),uri)
+                    val result =  uploadFile(post.authorId,post.timestamp.toString(),uri,index)
                     if(result.first){
                         imageUrls.add(result.second)
                     }
@@ -80,13 +84,51 @@ class PostRepoImp: PostRepo {
         }
 
     }
-    override suspend fun deletePost(authorId: String, timeStamp: Timestamp):Response<Boolean> {
+
+    override suspend fun getSelectedCountryPosts(country: String): Flow<Pair<Response<Boolean>, List<Post>>> = callbackFlow {
+
+        try{
+            val allPost = mutableListOf<Post>()
+            db.collection(Collections.POSTS)
+                .whereEqualTo("country",country)
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .get()
+                .addOnSuccessListener { snapshot->
+                    for (document in snapshot){
+
+                        val post = document.toObject<Post>()
+                        if(post.authorId!=SharedComponents.currentUser!!.uid){
+
+                            allPost.add(post)
+                        }
+                    }
+                    trySend(Pair(Response.Success(true),allPost))
+
+                }
+                .addOnFailureListener{
+                    throw Exception(it.message)
+                }
+
+        }
+        catch (e:Exception){
+
+            trySend(Pair(Response.Failure(e),emptyList()))
+        }
+        awaitClose {  }
+    }
+
+
+    override suspend fun deletePost(authorId: String, timeStamp: Timestamp,photosSize:Int):Response<Boolean> {
        try {
            db.collection(Collections.POSTS)
                .document("${authorId}_${timeStamp.toDate()}_${timeStamp.toDate().time}")
                .delete()
                .await()
-               deleteFile(authorId,timeStamp.toString())
+
+           for (index in 0 until photosSize){
+               deleteFile(authorId,timeStamp.toString(),index)
+           }
+
        return Response.Success(true).also {
 deleteSavedPostFromEveryUser(authorId,timeStamp)
        }
@@ -96,31 +138,48 @@ deleteSavedPostFromEveryUser(authorId,timeStamp)
         }
     }
 
-    override suspend fun getPost(): Flow<List<Post>> = callbackFlow {
+    override suspend fun getPost(country:String): Flow<Pair<Response<Boolean>,List<Post>>> = callbackFlow {
 
         try{
+
             val allPost = mutableListOf<Post>()
-db.collection(Collections.POSTS)
- .orderBy("timestamp", Query.Direction.DESCENDING)
+    db.collection(Collections.POSTS)
+    .whereEqualTo("country",country)
+    .orderBy("timestamp", Query.Direction.DESCENDING)
     .get()
     .addOnSuccessListener { snapshot->
         for (document in snapshot){
+
             val post = document.toObject<Post>()
             if(post.authorId!=SharedComponents.currentUser!!.uid){
-
                 allPost.add(post)
             }
 
         }
-        
-        trySend(allPost)
+        db.collection(Collections.POSTS)
+            .whereNotEqualTo("country",country)
+            .orderBy("timestamp", Query.Direction.DESCENDING)
+            .get()
+            .addOnSuccessListener{
+                for (document in it){
+
+                    val post = document.toObject<Post>()
+                    if(post.authorId!=SharedComponents.currentUser!!.uid){
+                        allPost.add(post)
+                    }
+
+                }
+                trySend(Pair(Response.Success(true),allPost))
+            }
+    }
+    .addOnFailureListener{
+        throw Exception(it.message)
     }
 
-            trySend(emptyList())
         }
         catch (e:Exception){
 
-trySend(emptyList())
+trySend(Pair(Response.Failure(e),emptyList()))
         }
         awaitClose {  }
     }
@@ -177,6 +236,11 @@ trySend(emptyList())
         }
     }
 
+
+
+
+
+
     override suspend fun getMyPosts(): Pair<Response<Boolean>, List<Post>> {
 
         try {
@@ -196,12 +260,110 @@ trySend(emptyList())
             return Pair(Response.Failure(e), emptyList())
         }
     }
-
-
-
-    private suspend fun uploadFile(authorId:String,timeStamp:String,fileUrl:String):Pair<Boolean,String>{
+    override suspend fun getFilteredPosts(
+        type: String,
+        gender: String,
+        breed: String,
+        city:String,
+        state:String,
+        country:String
+    ):Flow<Pair<Response<Boolean>,List<Post>>> = callbackFlow {
         try {
-            val ref = storage.reference.child("images/${authorId}/${authorId}_${timeStamp}")
+            val result = mutableListOf<Post>()
+            var query:Query = db.collection(Collections.POSTS).whereNotEqualTo("authorId",SharedComponents.currentUser!!.uid)
+            if(city!=""){
+                query = query.whereEqualTo("city",city)
+            }
+          else if(type!=""){
+                query = query.whereEqualTo("type",type)
+            }
+         else if(breed!=""){
+                query = query.whereEqualTo("breed",breed)
+            }
+           else if(gender!=""){
+                query = query.whereEqualTo("gender",gender)
+            }
+
+
+
+            query.orderBy("timestamp", Query.Direction.DESCENDING)
+                .get()
+                .addOnCompleteListener {
+                if(it.isSuccessful){
+                    for (doc in it.result.documents){
+                        val post = doc.toObject<Post>()
+                         if((type!=""&&type!=post!!.type)||(breed != "" && breed.lowercase() != post!!.breed.lowercase())||(gender != "" && gender != post!!.gender)){
+                            continue
+                        }
+                        result.add(post!!)
+                    }
+                    if(state!=""){
+                        val query2:Query = db.collection(Collections.POSTS).whereEqualTo("state",state).whereNotEqualTo("city",city)
+
+                       query2.orderBy("timestamp", Query.Direction.DESCENDING)
+                            .get()
+                            .addOnCompleteListener {q2 ->
+
+                            if(q2.isSuccessful){
+                                for (doc in q2.result.documents){
+
+                                    val post = doc.toObject<Post>()
+                                    if((post?.authorId == SharedComponents.currentUser!!.uid)|| (type!=""&&type!=post!!.type)||(breed != "" && breed.lowercase() != post!!.breed.lowercase())||(gender != "" && gender != post!!.gender)){
+                                        continue
+                                    }
+                                    result.add(post!!)
+                                }
+                                if(country!=""){
+
+                                    val query3:Query = db.collection(Collections.POSTS).whereNotEqualTo("state",state).whereEqualTo("country",country)
+
+                                    query3.orderBy("timestamp", Query.Direction.DESCENDING).get().addOnCompleteListener {q3 ->
+                                        if(q3.isSuccessful){
+
+                                            for (doc in q3.result.documents){
+
+                                                val post = doc.toObject<Post>()
+                                                if((post?.authorId == SharedComponents.currentUser!!.uid)||(type!=""&&type!=post!!.type)||(breed != "" && breed.lowercase() != post!!.breed.lowercase())||(gender != "" && gender != post!!.gender)){
+                                                    continue
+                                                }
+                                                result.add(post!!)
+                                            }
+
+                                            trySend(Pair(Response.Success(true),result))
+                                        }
+                                        else{
+                                            trySend(Pair(Response.Success(true),result))
+                                        }
+                                    }
+                                }
+                                else{
+                                    trySend(Pair(Response.Success(true),result))
+                                }
+                            }
+                            else{
+                                trySend(Pair(Response.Success(true),result))
+                            }
+                        }
+                    }
+                    else{
+                        trySend(Pair(Response.Success(true),result))
+                    }
+                }
+                else{
+                    trySend(Pair(Response.Failure(it.exception?:Exception("something is wrong.")), emptyList()))
+                }
+            }
+        }
+        catch (e:Exception){
+            trySend(Pair(Response.Failure(e), emptyList()))
+        }
+        awaitClose{}
+    }
+
+
+    private suspend fun uploadFile(authorId:String,timeStamp:String,fileUrl:String,index:Int):Pair<Boolean,String>{
+        try {
+            val ref = storage.reference.child("images/${authorId}/[$index]_${authorId}_${timeStamp}")
             ref.putFile(fileUrl.toUri()).await()
             return Pair(true,ref.downloadUrl.await().toString())
         }
@@ -211,9 +373,9 @@ trySend(emptyList())
 
     }
 
-    private fun deleteFile(authorId: String,timeStamp:String){
+    private fun deleteFile(authorId: String,timeStamp:String,index: Int){
         try{
-            val ref = storage.reference.child("images/${authorId}/${authorId}_${timeStamp}")
+            val ref = storage.reference.child("images/${authorId}/[$index]_${authorId}_${timeStamp}")
             ref.delete()
 
         }
@@ -249,15 +411,17 @@ db.collection(Collections.SAVED_POST)
                db.collection(Collections.SAVED_POST)
                    .document(doc.id)
                    .update(mapOf(
-                       "age" to post.age,
+                       "age" to post.bornOn,
                        "breed" to post.breed,
                        "description" to post.description,
                        "gender" to post.gender,
                        "healthInformation" to post.healthInformation,
-                       "location" to post.location,
+                       "state" to post.state,
                        "photos" to post.photos,
                        "type" to post.type,
-                       "name" to post.name
+                       "name" to post.name,
+                       "country" to post.country,
+                       "city" to post.city
                    ))
 
            }

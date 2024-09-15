@@ -80,7 +80,7 @@ val typographyCompact = Typography(
     headlineMedium = TextStyle(
         fontFamily = quickSand,
         fontWeight = FontWeight.SemiBold,
-        fontSize = 23.sp
+        fontSize = 22.sp
     ),
     headlineLarge = TextStyle(
         fontFamily = quickSand,

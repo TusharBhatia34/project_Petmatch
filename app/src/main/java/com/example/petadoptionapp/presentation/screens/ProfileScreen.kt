@@ -61,7 +61,6 @@ import coil.compose.SubcomposeAsyncImage
 import com.example.petadoptionapp.R
 import com.example.petadoptionapp.data.common.Response
 import com.example.petadoptionapp.data.common.Routes
-import com.example.petadoptionapp.domain.model.Location
 import com.example.petadoptionapp.ui.theme.AppTheme
 import com.example.petadoptionapp.ui.theme.quickSand
 
@@ -73,9 +72,8 @@ fun ProfileScreen(
     profilePicture:String,
     location:String,
     screenTitle:String,
-    currentLocation: Location,
     buttonText:String,
-    buttonAction :(name:String, location:String,about:String,profilePicture:String,locationInDouble:Location,sameImage:Boolean)->Unit,
+    buttonAction :(name:String, location:String,about:String,profilePicture:String,sameImage:Boolean)->Unit,
     responseAction :()->Unit,
     enabled:Boolean= true,
     navController: NavController,
@@ -85,8 +83,7 @@ fun ProfileScreen(
         var usernameField by rememberSaveable{ mutableStateOf(name) }
         var aboutField by rememberSaveable{ mutableStateOf(about) }
         var profilePictureField by rememberSaveable{ mutableStateOf(profilePicture)}
-        var locationField by rememberSaveable{ mutableStateOf(location) }
-        var locationInDouble by remember {mutableStateOf(currentLocation) }
+        var countryField by rememberSaveable{ mutableStateOf(location) }
         var isClicked by remember { mutableStateOf(false) }
         val initialUsernameField by rememberSaveable{ mutableStateOf(name) }
         val initialAboutField by rememberSaveable{ mutableStateOf(about) }
@@ -106,10 +103,10 @@ Scaffold (
             Button(onClick = {
 
                 if(enabled){
-                    if(usernameField!=""&&aboutField !=""&&locationField!=""){
+                    if(usernameField!=""&&aboutField !=""&&countryField!=""){
                         isClicked = true
                         val sameImage = initialProfilePictureField == profilePictureField
-                        buttonAction(usernameField, locationField, aboutField,profilePictureField ,locationInDouble,sameImage)
+                        buttonAction(usernameField, countryField, aboutField,profilePictureField,sameImage)
                     }
                     else {
                         Toast.makeText(context,"Please fill all the details.",Toast.LENGTH_SHORT).show()
@@ -129,7 +126,7 @@ Scaffold (
                     .padding(horizontal = AppTheme.dimens.mediumLarge)
                 ,
                 shape = RoundedCornerShape(8.dp),
-                enabled = (!enabled ||initialLocationField!=locationField || initialUsernameField!=usernameField || initialProfilePictureField != profilePictureField || initialAboutField!= aboutField)
+                enabled = (!enabled ||initialLocationField!=countryField || initialUsernameField!=usernameField || initialProfilePictureField != profilePictureField || initialAboutField!= aboutField)
             ) {
 
                 Text(
@@ -237,18 +234,15 @@ Scaffold (
             )
         Spacer(modifier = Modifier.height(AppTheme.dimens.small))
         OutlinedTextField(
-            value = locationField ,
+            value = countryField ,
             onValueChange = {},
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable(
                     onClick = {
-                        if (enabled && currentLocation.lat != 0.0 && currentLocation.long != 0.0) {
+                        if (enabled) {
                             navController.navigate(
-                                Routes.MapScreenRoute(
-                                    currentLocation.lat.toString(),
-                                    currentLocation.long.toString()
-                                )
+                                Routes.CountryListScreen()
                             )
                         }
                     },
@@ -318,16 +312,12 @@ Scaffold (
 
     }
 
-        val resultLocation = navController.currentBackStackEntry?.savedStateHandle?.get<String>("location")
-        resultLocation?.let {
-            locationField = it
-            navController.currentBackStackEntry?.savedStateHandle?.remove<String>("location")
+        val resultCountry = navController.currentBackStackEntry?.savedStateHandle?.get<String>("country")
+        resultCountry?.let {
+            countryField = it
+            navController.currentBackStackEntry?.savedStateHandle?.remove<String>("country")
         }
-    val locationDouble = navController.currentBackStackEntry?.savedStateHandle?.get<Pair<Double,Double>>("locationInDouble")
-    locationDouble?.let {(lat,long)->
-        locationInDouble = Location(lat =lat, long = long)
-        navController.currentBackStackEntry?.savedStateHandle?.remove<Pair<Double,Double>>("locationInDouble")
-    }
+
 
     }
 

@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.example.petadoptionapp.domain.model.Location
 import com.example.petadoptionapp.presentation.viewModels.ProfileViewModel
 
 @Composable
@@ -21,11 +20,10 @@ fun ViewProfileScreen(
             name = profile.name,
             about = profile.about ,
             profilePicture = profile.profilePicture ,
-            location = "${profile.city},${profile.state},${profile.country}",
+            location = profile.country,
             screenTitle = "Profile" ,
-            currentLocation = Location(profile.latitude,profile.longitude) ,
             buttonText = "Edit",
-            buttonAction = {name,location,about,profilePicture ,locationInDouble,sameImage->}, //we won't use this button action in viewProfileScreen.
+            buttonAction = { _, _, _, _, _ ->}, //we won't use this button action in viewProfileScreen.
             responseAction = { /*TODO*/ },
             navController = navController ,
             response = response,

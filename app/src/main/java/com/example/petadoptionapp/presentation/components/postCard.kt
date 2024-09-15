@@ -68,9 +68,9 @@ fun PostCard(
                 navController.navigate(
                     if (!isMyPostsScreen) {
                         Routes.PostDetailsScreen(
-                            age = post.age,
+                            age = post.bornOn,
                             gender = post.gender,
-                            location = post.location,
+                            city = post.city,
                             name = post.name,
                             photos = post.photos,
                             description = post.description,
@@ -78,13 +78,15 @@ fun PostCard(
                             healthInformation = post.healthInformation,
                             authorId = post.authorId,
                             timestamp = post.timestamp.toString(),
-                            type = post.type
+                            type = post.type,
+                            state = post.state,
+                            country = post.country
                         )
                     } else {
                         Routes.MyPostDetailsScreen(
-                            age = post.age,
+                            age = post.bornOn,
                             gender = post.gender,
-                            location = post.location,
+                            city = post.city,
                             name = post.name,
                             photos = post.photos,
                             description = post.description,
@@ -92,7 +94,9 @@ fun PostCard(
                             healthInformation = post.healthInformation,
                             authorId = post.authorId,
                             timestamp = post.timestamp.toString(),
-                            type = post.type
+                            type = post.type,
+                            state = post.state,
+                            country = post.country
                         )
                     }
 
@@ -132,7 +136,7 @@ Row (modifier = Modifier){
             tint = Color.Gray,
             modifier = Modifier .size(textHeightDp)
         )
-        Text(text = post.location, fontSize = 8.sp, color = Color.Gray, maxLines = 1,overflow = TextOverflow.Ellipsis, fontWeight = FontWeight.Bold, fontFamily = quickSand  , modifier = Modifier
+        Text(text = "${post.city}, ${post.state}, ${post.country}", fontSize = 8.sp, color = Color.Gray, maxLines = 1,overflow = TextOverflow.Ellipsis, fontWeight = FontWeight.Bold, fontFamily = quickSand  , modifier = Modifier
 
                 .onGloballyPositioned {
             textHeightDp = with(localDensity) { it.size.height.toDp() }
@@ -146,7 +150,7 @@ Row (modifier = Modifier){
             tint = Color.Gray,
             modifier = Modifier .size(textHeightDp)
         )
-        Text(text = post.age, fontSize = 8.sp, color = Color.Gray, maxLines = 1,overflow = TextOverflow.Ellipsis, fontWeight = FontWeight.Bold, fontFamily = quickSand)
+        Text(text = post.bornOn, fontSize = 8.sp, color = Color.Gray, maxLines = 1,overflow = TextOverflow.Ellipsis, fontWeight = FontWeight.Bold, fontFamily = quickSand)
     }
 
 }

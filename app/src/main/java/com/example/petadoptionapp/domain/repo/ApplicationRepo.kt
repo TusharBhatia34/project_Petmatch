@@ -15,4 +15,7 @@ interface ApplicationRepo {
     suspend fun getApplicationPost(authorId: String,timestamp: Timestamp):Pair<Post?,Response<Boolean>>
     suspend fun editNotification(applicantId:String,authorId:String,timestamp:Timestamp)
     suspend fun getAppliedApplications(applicantId: String):Pair<List<Applications>,Response<Boolean>>//to get all the applications user has applied.
+
+    suspend fun setApplicationStatus(documentId:String,status:String):Response<Boolean>
+
 }

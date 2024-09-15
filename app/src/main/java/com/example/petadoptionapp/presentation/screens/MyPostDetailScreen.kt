@@ -118,7 +118,7 @@ fun MyPostDetailScreen(
                     .alpha(0.5f)
                     .size(locationTextHeightDp)
             )
-            Text(text = post.location,modifier = Modifier
+            Text(text = "${post.city}, ${post.state}, ${post.country}",modifier = Modifier
                 .alpha(0.5f)
                 .onGloballyPositioned {
                     locationTextHeightDp = with(localDensity) { it.size.height.toDp() }
@@ -127,7 +127,7 @@ fun MyPostDetailScreen(
         Spacer(modifier = Modifier.height(AppTheme.dimens.mediumLarge))
         Row {
             Text(text = "Born on:",modifier = Modifier.width(70.dp), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
-            Text(text = post.age,modifier =Modifier.alpha(0.6f), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+            Text(text = post.bornOn,modifier =Modifier.alpha(0.6f), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
         }
         Spacer(modifier = Modifier.height(AppTheme.dimens.small))
 
@@ -162,16 +162,18 @@ fun MyPostDetailScreen(
                 Button(onClick = {
                                  navController.navigate(
                                      Routes.EditPostScreenRoute(
-                                         age = post.age,
+                                         age = post.bornOn,
                                          gender = post.gender,
-                                         location = post.location,
+                                         state = post.state,
                                          name = post.name,
                                          photos = post.photos,
                                          description = post.description,
                                          breed = post.breed,
                                          healthInformation = post.healthInformation,
                                          authorId = post.authorId,
-                                         type = post.type
+                                         type = post.type,
+                                         city = post.city,
+                                         country = post.country
                                      )
                                  )
                 },
@@ -215,7 +217,7 @@ fun MyPostDetailScreen(
             onDismissRequest = { showDialog = false },
             confirmButton = {
                 Button(onClick = {
-                    myPostViewModel.deletePost(authorId = SharedComponents.currentUser!!.uid,SharedComponents.timeStamp)
+                    myPostViewModel.deletePost(authorId = SharedComponents.currentUser!!.uid,SharedComponents.timeStamp,post.photos.size)
                     showDialog =false
                 },     colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
